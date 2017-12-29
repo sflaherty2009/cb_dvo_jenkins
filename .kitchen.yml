@@ -1,22 +1,60 @@
+# ---
+# driver:
+#   name: vagrant
+
+# provisioner:
+#   name: chef_zero
+
+# verifier:
+#   name: inspec
+
+# platforms:
+#   - name: centos-7.3
+#     transport:
+#       name: ssh
+#       username: vagrant
+#       password: vagrant
+#     driver:
+#       box: bento/centos-7.3
+#       network:
+#         - ['private_network', {ip: '192.168.56.14'}]
+
+# suites:
+#   - name: default
+#     run_list:
+#       - recipe[cb_dvo_jenkins::default]
+#     attributes:
+#       bbUserName: "<%= ENV['bbUserName'] %>"
+#       bbPassword: "<%= ENV['bbPassword'] %>"
+#     driver:
+#         memory: 1024
+#         cpus: 1
+
 ---
 driver:
-  name: vagrant
+  name: azurerm
+
+driver_config:
+  subscription_id: '9db13c96-62ad-4945-9579-74aeed296e48'
+  location: East US
+  machine_size: Standard_D1
+
+transport:
+  ssh_key: ~/.ssh/id_rsa
 
 provisioner:
   name: chef_zero
 
-verifier:
-  name: inspec
-
 platforms:
-  - name: ubuntu-16.04
-  - name: centos-7.2
-
+  - name: centos-7.3
+    driver_config:
+      image_urn: OpenLogic:CentOS:7.3:latest
+      vm_name: centos-vm
+      vm_tags:
+        ostype: linux
+        distro: centos
 suites:
   - name: default
     run_list:
       - recipe[cb_dvo_jenkins::default]
-    verifier:
-      inspec_tests:
-        - test/recipes
     attributes:
