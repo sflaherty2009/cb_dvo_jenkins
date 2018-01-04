@@ -11,6 +11,27 @@ node.default['jenkins']['master']['install_method'] = 'war'
 # node.default['jenkins']['master']['version'] = '2.46.3'
 node.default['java']['jdk_version'] = '8'
 
+# allow for port 8080 for accessing jenkins web gui.
+firewall_rule 'http/https' do
+  protocol :tcp
+  port     8080
+  command   :allow
+end
+
+# open standard ssh port
+firewall_rule 'ssh' do
+  port     22
+  command  :allow
+end
+
+firewall 'default' do
+  enabled false
+  action :nothing
+end
+
+# allow ssh through when accessing server.
+node.default['firewall']['allow_ssh'] = true
+
 #install jenkins with latest package. 
 include_recipe 'apt'
 # Install java version 8 
@@ -52,6 +73,7 @@ end
 # Install some plugins needed, but not installed on jenkins2 by default
 jenkins_plugins = %w(
   bitbucket
+  credentials
   active-directory
   audit-trail
   matrix-project
@@ -59,7 +81,6 @@ jenkins_plugins = %w(
   jobConfigHistory
   git-client
   git
-  gitlab-plugin
   scm-sync-configuration
   linenumbers
   slack
@@ -77,7 +98,11 @@ jenkins_plugins = %w(
   display-url-api
   antisamy-markup-formatter
   ssh-slaves
-  ec2
+  azure-vm-agents
+  azure-commons
+  cloud-stats
+  azure-credentials
+  plain-credentials
 )
 
 jenkins_plugins.each do |plugin|

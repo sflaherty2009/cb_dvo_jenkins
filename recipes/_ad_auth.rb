@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: dt_jenkins
+# Cookbook Name:: cb_dvo_jenkins
 # Recipe:: _ad_auth
 #
 # Copyright (c) 2017 The Authors, All Rights Reserved.

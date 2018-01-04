@@ -4,7 +4,7 @@ maintainer_email 'ray_crawford@trekbikes.com'
 license 'all_rights'
 description 'Installs/Configures jenkins resources with a focus on DVO Chef Pipeline needs.'
 long_description 'See README.md'
-version '0.1.1'
+version '0.1.2'
 
 source_url 'https://bitbucket.org/trekbikes/cb_dvo_jenkins'
 issues_url 'https://bitbucket.org/trekbikes/cb_dvo_jeknins/issues?status=new&status=open'
@@ -12,3 +12,4 @@ issues_url 'https://bitbucket.org/trekbikes/cb_dvo_jeknins/issues?status=new&sta
 depends 'apt', '~> 6.1.4'
 depends 'jenkins', '~> 5.0.5'
 depends 'java', '~> 1.50.0'
+depends 'firewall', '~> 2.6.2'
