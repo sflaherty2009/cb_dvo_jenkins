@@ -29,9 +29,6 @@ firewall 'default' do
   action :nothing
 end
 
-# allow ssh through when accessing server.
-node.default['firewall']['allow_ssh'] = true
-
 #install jenkins with latest package. 
 include_recipe 'apt'
 # Install java version 8 
@@ -52,6 +49,7 @@ ruby_block 'load_jenkins_credential' do
   end
 end
 
+# create the chef jenkins user so chef cookbook can run once permission has been shut down with LDAP.
 jenkins_user 'chef' do
   id "chef@#{Chef::Config[:node_name]}"
   full_name 'Chef'
@@ -70,69 +68,61 @@ end
 end
 
 ## JENKINS PLUGINS -------------------------------------------
-# Install some plugins needed, but not installed on jenkins2 by default
+# Install/update plugins needed
 jenkins_plugins = %w(
-  bitbucket
-  credentials
+  azure-commons
+  azure-credentials
+  azure-vm-agents
   active-directory
-  audit-trail
+  apache-httpcomponents-client-4-api  
+  bitbucket
+  bouncycastle-api
+  branch-api
+  cloud-stats
+  command-launcher
+  credentials-binding
+  credentials
+  cloudbees-folder
+  display-url-api
+  ldap
+  mailer
   matrix-project
   matrix-auth
-  jobConfigHistory
   git-client
   git
-  scm-sync-configuration
-  linenumbers
-  slack
-  credentials
+  jsch
   junit
-  mailer
-  mercurial
-  workflow-step-api
-  workflow-scm-step
+  linenumbers
   plain-credentials
+  slack
+  structs
+  ssh-credentials
+  ssh-slaves
   scm-api
   script-security
-  ssh-credentials
-  structs
-  display-url-api
-  antisamy-markup-formatter
-  ssh-slaves
-  azure-vm-agents
-  azure-commons
-  cloud-stats
-  azure-credentials
-  plain-credentials
+  workflow-api
+  workflow-scm-step
+  workflow-step-api
+  mercurial
 )
 
+# run to install the plugins
 jenkins_plugins.each do |plugin|
   jenkins_plugin plugin do
-    notifies :execute, 'jenkins_command[safe-restart]', :delayed
     notifies :execute, 'jenkins_script[Matrix_Authentication_configuration]', :delayed
+    notifies :restart, 'service[jenkins]', :immediately
   end
 end
 
-# jenkins command for a safe restart.
-jenkins_command 'safe-restart' do
-  action :nothing
+# run twice first to install and then the second time to update the plugins 
+jenkins_plugins.each do |plugin|
+  jenkins_plugin plugin do
+    notifies :execute, 'jenkins_script[Matrix_Authentication_configuration]', :delayed
+    notifies :restart, 'service[jenkins]', :immediately
+  end
 end
 
 #JENKINS CONFIGURATION -----------------------------------------
-
-# Run Jenkins script to get the list of latest plugins. Only do this daily.
-jenkins_script 'get list of latest plugins' do
-  command <<-eos.gsub(/^\s+/, '')
-    pm = jenkins.model.instance.pluginManager
-    pm.doCheckUpdatesServer()
-  eos
-
-  not_if do
-    update_frequency = 86_400 # daily
-    update_file = '/var/lib/jenkins/updates/default.json'
-    ::File.exists?(update_file) &&
-      ::File.mtime(update_file) > Time.now - update_frequency
-  end
-end
 
 # Set up security settings for AD configuration.
 jenkins_script 'Matrix_Authentication_configuration' do
@@ -141,6 +131,7 @@ jenkins_script 'Matrix_Authentication_configuration' do
       import hudson.security.*
       import hudson.plugins.active_directory.*
       import org.jenkinsci.plugins.*
+      
       def strategy = new hudson.security.GlobalMatrixAuthorizationStrategy()
 
       strategy.add(Jenkins.ADMINISTER, '#{resources('jenkins_user[chef]').id}')
@@ -150,10 +141,3 @@ jenkins_script 'Matrix_Authentication_configuration' do
     GROOVY
   action :nothing
 end
-
-# TODO create variable for active-directory
-# TODO create variable for jenkins installation.
-# template "/var/lib/jenkins/config.xml" do
-#   source 'config.xml.erb'
-#   mode '0644'
-# end
