@@ -14,14 +14,14 @@ node.default['java']['jdk_version'] = '8'
 # allow for port 8080 for accessing jenkins web gui.
 firewall_rule 'http/https' do
   protocol :tcp
-  port     8080
-  command   :allow
+  port 8080
+  command :allow
 end
 
 # open standard ssh port
 firewall_rule 'ssh' do
-  port     22
-  command  :allow
+  port 22
+  command :allow
 end
 
 firewall 'default' do
@@ -29,9 +29,9 @@ firewall 'default' do
   action :nothing
 end
 
-#install jenkins with latest package. 
+# install jenkins with latest package.
 include_recipe 'apt'
-# Install java version 8 
+# Install java version 8
 include_recipe 'java::default'
 # Install jenkins master server
 include_recipe 'jenkins::master'
@@ -58,7 +58,7 @@ end
 ## CREATE DIRECTORY FOR AUDIT LOGGING-------------------------
 
 # this path is needed for use with the audit trail plugin.
-%w[ /var/log/audit /var/log/audit/jenkins ].each do |path|
+%w( /var/log/audit /var/log/audit/jenkins ).each do |path|
   directory path do
     owner 'root'
     group 'root'
@@ -74,7 +74,7 @@ jenkins_plugins = %w(
   azure-credentials
   azure-vm-agents
   active-directory
-  apache-httpcomponents-client-4-api  
+  apache-httpcomponents-client-4-api
   bitbucket
   bouncycastle-api
   branch-api
@@ -114,7 +114,7 @@ jenkins_plugins.each do |plugin|
   end
 end
 
-# run twice first to install and then the second time to update the plugins 
+# run twice first to install and then the second time to update the plugins
 jenkins_plugins.each do |plugin|
   jenkins_plugin plugin do
     notifies :execute, 'jenkins_script[Matrix_Authentication_configuration]', :delayed
@@ -122,7 +122,7 @@ jenkins_plugins.each do |plugin|
   end
 end
 
-#JENKINS CONFIGURATION -----------------------------------------
+# JENKINS CONFIGURATION -----------------------------------------
 
 # Set up security settings for AD configuration.
 jenkins_script 'Matrix_Authentication_configuration' do
@@ -131,7 +131,7 @@ jenkins_script 'Matrix_Authentication_configuration' do
       import hudson.security.*
       import hudson.plugins.active_directory.*
       import org.jenkinsci.plugins.*
-      
+
       def strategy = new hudson.security.GlobalMatrixAuthorizationStrategy()
 
       strategy.add(Jenkins.ADMINISTER, '#{resources('jenkins_user[chef]').id}')

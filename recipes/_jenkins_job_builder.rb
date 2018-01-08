@@ -12,10 +12,10 @@
 #     action :sync
 # end
 
-#Jenkins user used for jenkins build jobs
+# Jenkins user used for jenkins build jobs
 jenkins_user node['jenkins_job_builder']['username'] do
   full_name node['jenkins_job_builder']['username']
-  public_keys  node['jenkins_job_builder']['password']
+  public_keys node['jenkins_job_builder']['password']
 end
 
 python_runtime 'jenkins' do
@@ -24,7 +24,6 @@ python_runtime 'jenkins' do
 end
 
 # Will re-install on every converge unless you add a not_if/only_if.
-#python_execute 'pip install --user jenkins-job-builder'
 python_package 'jenkins-job-builder'
 
 directory '/etc/jenkins_jobs' do
@@ -39,9 +38,9 @@ template '/etc/jenkins_jobs/jenkins_jobs.ini' do
   group node['jenkins_job_builder']['group']
   mode '0640'
   variables(
-    :username => node['jenkins_job_builder']['username'],
-    :password => node['jenkins_job_builder']['password'],
-    :url => node['jenkins_job_builder']['url'],
-    :external_url => node['jenkins']['server']['url']
+    username: node['jenkins_job_builder']['username'],
+    password: node['jenkins_job_builder']['password'],
+    url: node['jenkins_job_builder']['url'],
+    external_url: node['jenkins']['server']['url']
   )
 end
