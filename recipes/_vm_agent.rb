@@ -7,6 +7,10 @@
 # Recipe used for automatically deploying azure agents on server utilization
 # underscore placed in front of recipe name because it should not be run standalone.
 
+# WILL NEED TO TEST THIS AND VERIFY IT WORKS APPROPRIATLEY.
+# node.run_state[:jenkins_username] = 'chef'
+# node.run_state[:jenkins_password] = 'Tr#kB1k3s'
+
 # Add credentials for use with accessing azure vms
 jenkins_password_credentials 'jenkins_azure' do
   id          'jenkins_azure'

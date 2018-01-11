@@ -11,6 +11,8 @@ node.default['jenkins']['master']['install_method'] = 'war'
 # node.default['jenkins']['master']['version'] = '2.46.3'
 node.default['java']['jdk_version'] = '8'
 
+## SECURITY --------------------------------------------------
+
 # allow for port 8080 for accessing jenkins web gui.
 firewall_rule 'http/https' do
   protocol :tcp
@@ -36,108 +38,160 @@ include_recipe 'java::default'
 # Install jenkins master server
 include_recipe 'jenkins::master'
 
-# Jenkins user for running commands once auth is in place (otherwise chef run will fail).
-ruby_block 'load_jenkins_credential' do
+# pull in private key from data bag contained within the cookbook (test/integration/data_bags/jenkins/keys.jxon)
+jenkins_auth = data_bag_item('jenkins', 'keys')
+
+# add requirements to create the public key from the private key
+require 'openssl'
+require 'net/ssh'
+
+# create our public key on the chef system itself so that no one can access the account or have access to the key.
+key = OpenSSL::PKey::RSA.new(jenkins_auth['private_key'])
+private_key = key.to_pem
+public_key = "#{key.ssh_type} #{[key.to_blob].pack('m0')}"
+
+# Set jenkins private key only if security is not enabled.
+ruby_block 'set jenkins private key' do
   block do
-    require 'openssl'
-    require 'net/ssh'
+    node.run_state[:jenkins_private_key] = private_key
+  end
+  only_if { node.attribute?('security_enabled') }
+end
 
-    key = ::OpenSSL::PKey::RSA.new ::File.read Chef::Config[:client_key]
-    node.run_state[:jenkins_private_key] = key.to_pem # ~FC001
-    jenkins = resources('jenkins_user[chef]') # ~FC001
-    jenkins.public_keys ["#{key.ssh_type} #{[key.to_blob].pack('m0')}"] # ~FC001
+## PLUG-INS -------------------------------------------------
+
+# list of plugins needed for the chef jenkins server.
+plugins = {
+  'azure-commons' => '0.2.4',
+  'azure-credentials' => '1.4.0',
+  'azure-vm-agents' => '0.6.0',
+  'active-directory' => '2.6',
+  'apache-httpcomponents-client-4-api' => '1.625.3',
+  'bitbucket' => '1.1.8',
+  'bouncycastle-api' => '2.16.2',
+  'branch-api' => '2.0.18',
+  'cloud-stats' => '0.16',
+  'command-launcher' => '1.2',
+  'credentials-binding' => '1.13',
+  'credentials' => '2.1.16',
+  'cloudbees-folder' => '6.3',
+  'display-url-api' => '2.2.0',
+  'ldap' => '1.18',
+  'mailer' => '1.20',
+  'matrix-project' => '1.12',
+  'matrix-auth' => '2.2',
+  'git-client' => '2.7.0',
+  'git' => '3.7.0',
+  'jsch' => '0.1.54.1',
+  'junit' => '1.23',
+  'linenumbers' => '1.2',
+  'plain-credentials' => '1.4',
+  'slack' => '2.3',
+  'structs' => '1.10',
+  'ssh-credentials' => '1.13',
+  'ssh-slaves' => '1.25',
+  'scm-api' => '2.2.6',
+  'script-security' => '1.40',
+  'workflow-api' => '2.24',
+  'workflow-scm-step' => '2.6',
+  'workflow-step-api' => '2.14',
+  'mercurial' => '2.2',
+}
+
+# run each plugin once with the version given to it. Do not run dependencies. Notify restart on the service only if it's the last plugin. 
+plugins.each_with_index do |(plugin_name, plugin_version), index|
+  jenkins_plugin plugin_name do
+    version plugin_version
+    install_deps false
+    action :install
+    # only restart on the final plugin
+    if index == (plugins.size - 1)
+      notifies :restart, 'runit_service[jenkins]', :immediately
+    end
   end
 end
 
-# create the chef jenkins user so chef cookbook can run once permission has been shut down with LDAP.
-jenkins_user 'chef' do
-  id "chef@#{Chef::Config[:node_name]}"
-  full_name 'Chef'
+## ADDITIONAL SERVER CONFIGURATION---------------------------
+
+# configure the vm agent for creating jenkins agent servers.
+include_recipe 'cb_dvo_jenkins::_vm_agent'
+
+# install the jenkins job builder on the master jenkins server.
+include_recipe 'cb_dvo_jenkins::_jenkins_job_builder'
+
+## ACCOUNTS -------------------------------------------------
+
+# Add the admin user only if it has not been added already then notify the resource
+# to configure the permissions for the admin user
+jenkins_user 'admin' do
+  password    'Tr3kbikes!1'
+  public_keys [public_key]
+  not_if { node.attribute?('security_enabled') }
+  notifies :execute, 'jenkins_script[configure permissions]', :immediately
 end
 
-## CREATE DIRECTORY FOR AUDIT LOGGING-------------------------
-
-# this path is needed for use with the audit trail plugin.
-%w( /var/log/audit /var/log/audit/jenkins ).each do |path|
-  directory path do
-    owner 'root'
-    group 'root'
-    mode '0755'
-    action :create
-  end
-end
-
-## JENKINS PLUGINS -------------------------------------------
-# Install/update plugins needed
-jenkins_plugins = %w(
-  azure-commons
-  azure-credentials
-  azure-vm-agents
-  active-directory
-  apache-httpcomponents-client-4-api
-  bitbucket
-  bouncycastle-api
-  branch-api
-  cloud-stats
-  command-launcher
-  credentials-binding
-  credentials
-  cloudbees-folder
-  display-url-api
-  ldap
-  mailer
-  matrix-project
-  matrix-auth
-  git-client
-  git
-  jsch
-  junit
-  linenumbers
-  plain-credentials
-  slack
-  structs
-  ssh-credentials
-  ssh-slaves
-  scm-api
-  script-security
-  workflow-api
-  workflow-scm-step
-  workflow-step-api
-  mercurial
-)
-
-# run to install the plugins
-jenkins_plugins.each do |plugin|
-  jenkins_plugin plugin do
-    notifies :execute, 'jenkins_script[Matrix_Authentication_configuration]', :delayed
-    notifies :restart, 'service[jenkins]', :immediately
-  end
-end
-
-# run twice first to install and then the second time to update the plugins
-jenkins_plugins.each do |plugin|
-  jenkins_plugin plugin do
-    notifies :execute, 'jenkins_script[Matrix_Authentication_configuration]', :delayed
-    notifies :restart, 'service[jenkins]', :immediately
-  end
-end
+include_recipe 'cb_dvo_jenkins::_users'
 
 # JENKINS CONFIGURATION -----------------------------------------
 
-# Set up security settings for AD configuration.
-jenkins_script 'Matrix_Authentication_configuration' do
-  command <<-GROOVY.gsub(/^ {4}/, '')
-      import jenkins.model.*
-      import hudson.security.*
-      import hudson.plugins.active_directory.*
-      import org.jenkinsci.plugins.*
+# # Set up security settings for AD configuration.
+# jenkins_script 'Matrix_Authentication_configuration' do
+#   command <<-GROOVY.gsub(/^ {4}/, '')
+#     import jenkins.model.*
+#     import hudson.security.*
+#     import hudson.plugins.active_directory.*
+#     import org.jenkinsci.plugins.*
 
-      def strategy = new hudson.security.GlobalMatrixAuthorizationStrategy()
+#     def strategy = new hudson.security.GlobalMatrixAuthorizationStrategy()
+#     strategy.add(Jenkins.ADMINISTER, 'chef')
+#     strategy.add(Jenkins.ADMINISTER, 'admin')
+#     strategy.add(Jenkins.READ, 'anonymous')
 
-      strategy.add(Jenkins.ADMINISTER, '#{resources('jenkins_user[chef]').id}')
-      strategy.add(Jenkins.ADMINISTER, 'anonymous')
+#     Jenkins.instance.setAuthorizationStrategy(strategy)
+#   GROOVY
+# end
 
-      Jenkins.instance.setAuthorizationStrategy(strategy)
-    GROOVY
+# Configure the permissions so that login is required and the admin user is an administrator
+# after this point the private key will be required to execute jenkins scripts (including querying
+# if users exist) so we notify the `set the security_enabled flag` resource to set this up.
+# Also note that since Jenkins 1.556 the private key cannot be used until after the admin user
+# has been added to the security realm
+jenkins_script 'configure permissions' do
+  command <<-EOH.gsub(/^ {4}/, '')
+    import jenkins.model.*
+    import hudson.security.*
+    def instance = Jenkins.getInstance()
+    def hudsonRealm = new HudsonPrivateSecurityRealm(false)
+    instance.setSecurityRealm(hudsonRealm)
+    def strategy = new GlobalMatrixAuthorizationStrategy()
+    strategy.add(Jenkins.ADMINISTER, "admin")
+    strategy.add(Jenkins.ADMINISTER, "rcrawford")
+    strategy.add(Jenkins.ADMINISTER, "nlocke")
+    strategy.add(Jenkins.ADMINISTER, "deasland")
+    strategy.add(Jenkins.ADMINISTER, "sflaherty")
+    instance.setAuthorizationStrategy(strategy)
+    instance.save()
+  EOH
+  notifies :create, 'ruby_block[set the security_enabled flag]', :immediately
   action :nothing
 end
+
+# Set the security enabled flag and set the run_state to use the configured private key
+ruby_block 'set the security_enabled flag' do
+  block do
+    node.run_state[:jenkins_private_key] = private_key
+    node.set['security_enabled'] = true
+    node.save
+  end
+  action :nothing
+end
+
+# NOTE Will have to remove AD authentication until groovy can work appropriately to add and remove users/groups or will allow for local user access as well.
+## When adding AD authentication method to Jenkins box you loose the ability to use local accounts
+# This breaks chef's ability to log back into box.
+# AD authentication plugin cannot add permissions to jenkins box for AD users.
+# In order to use this plugin manual steps would need to be taken.
+# https://issues.jenkins-ci.org/browse/JENKINS-29162
+# https://github.com/jenkinsci/active-directory-plugin/blob/master/src/main/java/hudson/plugins/active_directory/ActiveDirectorySecurityRealm.java
+
+# include_recipe 'cb_dvo_jenkins::_ad_auth'
