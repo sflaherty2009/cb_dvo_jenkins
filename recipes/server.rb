@@ -53,7 +53,7 @@ public_key = "#{key.ssh_type} #{[key.to_blob].pack('m0')}"
 # Set jenkins private key only if security is not enabled.
 ruby_block 'set jenkins private key' do
   block do
-    node.run_state[:jenkins_private_key] = private_key
+    node.run_state[:jenkins_private_key] = private_key # ~FC001
   end
   only_if { node.attribute?('security_enabled') }
 end
@@ -179,7 +179,7 @@ end
 # Set the security enabled flag and set the run_state to use the configured private key
 ruby_block 'set the security_enabled flag' do
   block do
-    node.run_state[:jenkins_private_key] = private_key
+    node.run_state[:jenkins_private_key] = private_key # ~FC001
     node.set['security_enabled'] = true
     node.save
   end
