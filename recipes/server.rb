@@ -98,7 +98,7 @@ plugins = {
   'mercurial' => '2.2'
 }
 
-# run each plugin once with the version given to it. Do not run dependencies. Notify restart on the service only if it's the last plugin. 
+# run each plugin once with the version given to it. Do not run dependencies. Notify restart on the service only if it's the last plugin.
 plugins.each_with_index do |(plugin_name, plugin_version), index|
   jenkins_plugin plugin_name do
     version plugin_version
