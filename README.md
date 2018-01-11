@@ -368,6 +368,43 @@ end
 
 **NOTE** You may need to restart Jenkins after changing a plugin. Because this varies on a case-by-case basis (and because everyone chooses to manage their Jenkins infrastructure differently) this LWRP does **NOT** restart Jenkins for you.
 
+### current plugins installed 
+
+'azure-commons' => '0.2.4',
+'azure-credentials' => '1.4.0',
+'azure-vm-agents' => '0.6.0',
+'active-directory' => '2.6',
+'apache-httpcomponents-client-4-api' => '1.625.3',
+'bitbucket' => '1.1.8',
+'bouncycastle-api' => '2.16.2',
+'branch-api' => '2.0.18',
+'cloud-stats' => '0.16',
+'command-launcher' => '1.2',
+'credentials-binding' => '1.13',
+'credentials' => '2.1.16',
+'cloudbees-folder' => '6.3',
+'display-url-api' => '2.2.0',
+'ldap' => '1.18',
+'mailer' => '1.20',
+'matrix-project' => '1.12',
+'matrix-auth' => '2.2',
+'git-client' => '2.7.0',
+'git' => '3.7.0',
+'jsch' => '0.1.54.1',
+'junit' => '1.23',
+'linenumbers' => '1.2',
+'plain-credentials' => '1.4',
+'slack' => '2.3',
+'structs' => '1.10',
+'ssh-credentials' => '1.13',
+'ssh-slaves' => '1.25',
+'scm-api' => '2.2.6',
+'script-security' => '1.40',
+'workflow-api' => '2.24',
+'workflow-scm-step' => '2.6',
+'workflow-step-api' => '2.14',
+'mercurial' => '2.2',
+
 ### jenkins_slave
 
 **NOTE** The use of the Jenkins user resource requires the Jenkins SSH credentials plugin. This plugin is not shipped by default in jenkins 2.x.
