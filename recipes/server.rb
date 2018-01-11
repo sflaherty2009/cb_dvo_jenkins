@@ -95,7 +95,7 @@ plugins = {
   'workflow-api' => '2.24',
   'workflow-scm-step' => '2.6',
   'workflow-step-api' => '2.14',
-  'mercurial' => '2.2',
+  'mercurial' => '2.2'
 }
 
 # run each plugin once with the version given to it. Do not run dependencies. Notify restart on the service only if it's the last plugin. 
@@ -133,23 +133,6 @@ end
 include_recipe 'cb_dvo_jenkins::_users'
 
 # JENKINS CONFIGURATION -----------------------------------------
-
-# # Set up security settings for AD configuration.
-# jenkins_script 'Matrix_Authentication_configuration' do
-#   command <<-GROOVY.gsub(/^ {4}/, '')
-#     import jenkins.model.*
-#     import hudson.security.*
-#     import hudson.plugins.active_directory.*
-#     import org.jenkinsci.plugins.*
-
-#     def strategy = new hudson.security.GlobalMatrixAuthorizationStrategy()
-#     strategy.add(Jenkins.ADMINISTER, 'chef')
-#     strategy.add(Jenkins.ADMINISTER, 'admin')
-#     strategy.add(Jenkins.READ, 'anonymous')
-
-#     Jenkins.instance.setAuthorizationStrategy(strategy)
-#   GROOVY
-# end
 
 # Configure the permissions so that login is required and the admin user is an administrator
 # after this point the private key will be required to execute jenkins scripts (including querying

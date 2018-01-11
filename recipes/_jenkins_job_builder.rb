@@ -32,14 +32,14 @@ end
 # Install the jenkins-job-builder package through pip
 python_package 'jenkins-job-builder'
 
-# set the owner of the jenkins-job folder to the jenkins-job-builder user. 
+# set the owner of the jenkins-job folder to the jenkins-job-builder user.
 directory '/etc/jenkins_jobs' do
   owner node['jenkins_job_builder']['user']
   group node['jenkins_job_builder']['group']
   mode '0750'
 end
 
-# modify the jenkins_job.ini with the jenkins job-builder user and url for our jenkins server. 
+# modify the jenkins_job.ini with the jenkins job-builder user and url for our jenkins server.
 template '/etc/jenkins_jobs/jenkins_jobs.ini' do
   source 'jenkins_jobs.ini.erb'
   owner node['jenkins_job_builder']['user']
