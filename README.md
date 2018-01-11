@@ -1,11 +1,10 @@
 # cb_dvo_jenkins
 
 TO DO 
-- Will need to setup AD with proper information before adding it to default recipe.
-- Need to determine the plugins currently being used with our Jenkins implementation.
-- Need to setup slave servers through cookbook. 
-- Need to determine best practice for storing jenkins jobs when cookbooks are in use.
 - profit
+
+KNOWN ISSUES 
+- When adding AD authentication method to Jenkins box you loose the ability to use local accounts. This breaks chef's ability to log back into box. AD authentication plugin cannot add permissions to jenkins box for AD users.In order to use this plugin manual steps would need to be taken.
 
 
 Installs and configures Jenkins CI master & node slaves. Resource providers to support automation via jenkins-cli, including job create/update.
