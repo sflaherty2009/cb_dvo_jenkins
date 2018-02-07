@@ -63,6 +63,7 @@ end
 # list of plugins needed for the chef jenkins server.
 plugins = {
   'azure-commons' => '0.2.4',
+  'authentication-tokens' => '1.1',
   'azure-credentials' => '1.4.0',
   'azure-vm-agents' => '0.6.0',
   'active-directory' => '2.6',
@@ -97,7 +98,10 @@ plugins = {
   'workflow-api' => '2.24',
   'workflow-scm-step' => '2.6',
   'workflow-step-api' => '2.14',
-  'mercurial' => '2.2'
+  'workflow-cps' => '2.25',
+  'workflow-durable-task-step' => '2.8',
+  'mercurial' => '2.2',
+  'parameterized-trigger' => '2.35.2'
 }
 
 # run each plugin once with the version given to it. Do not run dependencies. Notify restart on the service only if it's the last plugin.

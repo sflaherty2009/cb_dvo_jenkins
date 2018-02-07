@@ -28,9 +28,10 @@
 #         cpus: 1
 
 ---
+# Make sure VPN is turned on before running kitchen or SSH connection will fail.
 driver:
   name: azurerm
-
+  
 # Production subscription ID. Credentials for this subscriptionj need to be established in your .azure/credentials file.
 driver_config:
   subscription_id: '9fbf7025-df40-4908-b7fb-a3a2144cee91'
@@ -61,6 +62,3 @@ suites:
     run_list:
       - recipe[cb_dvo_jenkins::default]
     attributes:
-    driver:
-      memory: 1024
-      cpus: 1
