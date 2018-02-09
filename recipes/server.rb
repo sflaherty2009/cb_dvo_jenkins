@@ -8,8 +8,10 @@
 
 node.default['jenkins']['master']['jvm_options'] = '-Djenkins.install.runSetupWizard=false'
 node.default['jenkins']['master']['install_method'] = 'war'
-# node.default['jenkins']['master']['version'] = '2.46.3'
 node.default['java']['jdk_version'] = '8'
+
+# Install aws cli
+include_recipe 'cb_dvo_jenkins::_azure_cli'
 
 ## SECURITY --------------------------------------------------
 

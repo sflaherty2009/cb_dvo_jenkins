@@ -24,3 +24,6 @@ default['jenkins_job_builder']['password'] = 'vbMD2m6bQCkUol9HRHBmmuY7'
 default['jenkins_job_builder']['url'] = 'http://localhost:8080'
 # external url for the jenkins server.
 default['jenkins']['server']['url'] = 'http://jenkins-test:8080'
+
+default['azurecli']['azure']['python']['version'] = '2'
+default['azurecli']['azure']['python']['provider'] = :system
