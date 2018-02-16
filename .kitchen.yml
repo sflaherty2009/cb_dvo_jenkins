@@ -60,7 +60,7 @@
         # vnet and subnet id will work in web technology prod only. Disable otherwise.
         vnet_id: /subscriptions/9fbf7025-df40-4908-b7fb-a3a2144cee91/resourceGroups/AZ-RG-Network/providers/Microsoft.Network/virtualNetworks/AZ-VN-EastUS2-02
         subnet_id: AZ-SN-dvo
-        vm_name: chef-jenkins
+        vm_name: test-kitchen
         vm_tags:
           ostype: linux
           distro: centos
