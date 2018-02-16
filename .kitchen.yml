@@ -28,37 +28,47 @@
 #         cpus: 1
 
 ---
-# Make sure VPN is turned on before running kitchen or SSH connection will fail.
-driver:
-  name: azurerm
+  # Make sure VPN is turned on before running kitchen or SSH connection will fail.
+  driver:
+    name: azurerm
+    
+  # Production subscription ID. Credentials for this subscriptionj need to be established in your .azure/credentials file.
+  driver_config:
+    subscription_id: '9fbf7025-df40-4908-b7fb-a3a2144cee91'
+    location: East US 2
+    machine_size: Standard_D1
   
-# Production subscription ID. Credentials for this subscriptionj need to be established in your .azure/credentials file.
-driver_config:
-  subscription_id: '9fbf7025-df40-4908-b7fb-a3a2144cee91'
-  location: East US 2
-  machine_size: Standard_D1
-
-transport:
-  ssh_key: ~/.ssh/id_rsa
-
-provisioner:
-  name: chef_zero
-
-platforms:
-  - name: centos-7.3
-    driver_config:
-      image_urn: OpenLogic:CentOS:7.3:latest
-      # vnet and subnet id will work in web technology prod only. Disable otherwise.
-      vnet_id: /subscriptions/9fbf7025-df40-4908-b7fb-a3a2144cee91/resourceGroups/AZ-RG-Network/providers/Microsoft.Network/virtualNetworks/AZ-VN-EastUS2-02
-      subnet_id: AZ-SN-dvo
-      vm_name: chef-jenkins
-      vm_tags:
-        ostype: linux
-        distro: centos
-
-suites:
-  - name: default
-    data_bags_path: "test/integration/data_bags" 
-    run_list:
-      - recipe[cb_dvo_jenkins::default]
-    attributes:
+  transport:
+    ssh_key: ~/.ssh/id_rsa
+  
+  provisioner:
+    name: chef_zero
+    retry_on_exit_code:
+      - 35 # 35 is the exit code signaling that the node is rebooting
+      - 1
+    max_retries: 3
+    multiple_converge: 3
+    wait_for_retry: 600
+    client_rb:
+      exit_status: :enabled # Opt-in to the standardized exit codes
+      client_fork: false  # Forked instances don't return the real exit code
+  
+  platforms:
+    - name: centos-7.3
+      driver_config:
+        image_urn: OpenLogic:CentOS:7.3:latest
+        # vnet and subnet id will work in web technology prod only. Disable otherwise.
+        vnet_id: /subscriptions/9fbf7025-df40-4908-b7fb-a3a2144cee91/resourceGroups/AZ-RG-Network/providers/Microsoft.Network/virtualNetworks/AZ-VN-EastUS2-02
+        subnet_id: AZ-SN-dvo
+        vm_name: chef-jenkins
+        vm_tags:
+          ostype: linux
+          distro: centos
+  
+  suites:
+    - name: default
+      data_bags_path: "test/integration/data_bags" 
+      run_list:
+        - recipe[cb_dvo_jenkins::default]
+      attributes:
+  
