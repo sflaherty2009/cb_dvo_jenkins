@@ -40,9 +40,9 @@ include_recipe 'java::default'
 # Install jenkins master server
 include_recipe 'jenkins::master'
 # Install git on machine for use with bitbucket pulls
-yum_package 'git'
+package 'git'
 # Install git on machine for use with bitbucket pulls
-yum_package 'sshpass'
+package 'sshpass'
 
 # pull in private key from data bag contained within the cookbook (test/integration/data_bags/jenkins/keys.json)
 jenkins_auth = data_bag_item('jenkins', 'keys')
