@@ -1,17 +1,27 @@
 node{
     stage ("Repo Pull"){
         if (fileExists("/data/cookbooks/${env.JOB_NAME}")) {
-            sh "cd /data/cookbooks/${env.JOB_NAME}; git pull --rebase"
-            sh """
-                source /etc/profile
-                cd /data/cookbooks/${env.JOB_NAME}
-                berks update
-            """
+            sh "cd /data/cookbooks/${env.JOB_NAME}; git pull"
+            if (fileExists("/data/cookbooks/${env.JOB_NAME}/Berksfile.lock")){
+                sh """
+                    source /etc/profile
+                    cd /data/cookbooks/${env.JOB_NAME}
+                    berks update
+                """
+            }
+            else{
+                sh "mkdir -p mkdir /data/cookbooks/${env.JOB_NAME}/.berkshelf"
+                sh "echo '{\"ssl\": {\"verify\": false}}' > /data/cookbooks/${env.JOB_NAME}/.berkshelf/config.json; echo -e \"source :chef_server\nsource 'https://supermarket.chef.io'\n\nmetadata\" > /data/cookbooks/${env.JOB_NAME}/Berksfile"
+                sh """
+                    cd /data/cookbooks/${env.JOB_NAME}
+                    berks install
+                """
+            }
         } else {
             sh "git clone https://TrekDevOps:WQrULM66cGyPyB@bitbucket.org/trekbikes/${env.JOB_NAME}.git /data/cookbooks/${env.JOB_NAME}"
+            sh "mkdir -p mkdir /data/cookbooks/${env.JOB_NAME}/.berkshelf"
+            sh "echo '{\"ssl\": {\"verify\": false}}' > /data/cookbooks/${env.JOB_NAME}/.berkshelf/config.json; echo -e \"source :chef_server\nsource 'https://supermarket.chef.io'\n\nmetadata\" > /data/cookbooks/${env.JOB_NAME}/Berksfile"
             sh """
-                cd /data/cookbooks/${env.JOB_NAME}
-                source /etc/profile
                 cd /data/cookbooks/${env.JOB_NAME}
                 berks install
             """
@@ -30,12 +40,6 @@ node{
        sh """
         source /etc/profile
         cd /data/cookbooks/${env.JOB_NAME}
-        if test ! -e .berkshelf ; then
-          mkdir .berkshelf
-        fi
-        echo '{"ssl": {"verify": false}}' > .berkshelf/config.json
-        echo -e "source :chef_server\nsource 'https://supermarket.chef.io'\n\nmetadata" > Berksfile
-        berks install
         berks upload
        """
     }

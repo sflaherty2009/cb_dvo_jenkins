@@ -12,7 +12,7 @@ source_url 'https://bitbucket.org/trekbikes/cb_dvo_jenkins'
 issues_url 'https://bitbucket.org/trekbikes/cb_dvo_jeknins/issues?status=new&status=open'
 
 depends 'apt', '~> 6.1.4'
-depends 'jenkins', '~> 5.0.5'
+depends 'jenkins', '~> 6.0.0'
 depends 'java', '~> 1.50.0'
 depends 'firewall', '~> 2.6.2'
 depends 'poise-python', '~> 1.6.0'

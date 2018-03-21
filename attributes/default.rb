@@ -7,6 +7,7 @@ default['subscriptionId'] = '9fbf7025-df40-4908-b7fb-a3a2144cee91'
 default['aadClientId'] = 'e79ed5bc-5413-4eb0-b8ae-5114c9843a6e'
 default['aadClientSecret'] = '/TwccqeAqW4VUXmZwP3lwiLjokslMW18434HX/BFpzU='
 default['tenantId'] = '9dcd6c72-99eb-423d-b4d9-794d81eef415'
+default['transfer_password'] = '1JJsvHslasdfjVEroftprNn4JHtDi'
 
 # jenkins agent credentials
 default['agent_password'] = 'ThisIsAPassword#1'

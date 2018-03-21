@@ -1,0 +1,9 @@
+current_dir = File.dirname(__FILE__)
+log_level                :info
+log_location             STDOUT
+node_name                "dvo_jenkins"
+client_key               "#{current_dir}/dvo_jenkins.pem"
+chef_server_url          "https://10.16.192.4/organizations/trek"
+cookbook_path            ["#{current_dir}/cookbooks/"]
+ssl_verify_mode          :verify_none
+verify_api_cert          false

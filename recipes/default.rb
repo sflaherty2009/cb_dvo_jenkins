@@ -4,10 +4,6 @@
 #
 # Copyright (c) 2016 The Authors, All Rights Reserved.
 
-# Install jq for use with API calls for Statuspage.io (maintenancePage workflow)
-package 'epel-release'
-package 'jq'
-
 # Call the default server installation.
 include_recipe 'cb_dvo_jenkins::server'
 include_recipe 'chef-dk'
