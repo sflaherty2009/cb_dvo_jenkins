@@ -68,75 +68,75 @@ end
 
 # list of plugins needed for the chef jenkins server.
 plugins = {
-  'maven-plugin' => '3.1',
-  'azure-commons' => '0.2.4',
+  'maven-plugin' => '3.1.2',
+  'azure-commons' => '0.2.5',
   'ace-editor' => '1.1',
   'authentication-tokens' => '1.3',
-  'azure-credentials' => '1.5.0',
-  'azure-vm-agents' => '0.6.2',
-  'apache-httpcomponents-client-4-api' => '4.5.3-2.1',
+  'azure-credentials' => '1.6.0',
+  'azure-vm-agents' => '0.7.0',
+  'apache-httpcomponents-client-4-api' => '4.5.5-2.0',
   'bitbucket' => '1.1.8',
   'bouncycastle-api' => '2.16.2',
-  'branch-api' => '2.0.18',
-  'blueocean' => '1.4.2',
-  'blueocean-rest' => '1.4.2',
-  'blueocean-web' => '1.4.2',
-  'blueocean-commons' => '1.4.2',
-  'blueocean-bitbucket-pipeline' => '1.4.2',
-  'blueocean-config' => '1.4.2',
-  'blueocean-dashboard' => '1.4.2',
-  'blueocean-events' => '1.4.2',
-  'blueocean-git-pipeline' => '1.4.2',
-  'blueocean-github-pipeline' => '1.4.2',
-  'blueocean-i18n' => '1.4.2',
-  'blueocean-jira' => '1.4.2',
-  'blueocean-jwt' => '1.4.2',
-  'blueocean-core-js' => '1.4.2',
-  'blueocean-personalization' => '1.4.2',
-  'blueocean-pipeline-api-impl' => '1.4.2',
-  'blueocean-pipeline-editor' => '1.4.2',
+  'branch-api' => '2.0.20',
+  'blueocean' => '1.5.0',
+  'blueocean-rest' => '1.5.0',
+  'blueocean-web' => '1.5.0',
+  'blueocean-commons' => '1.5.0',
+  'blueocean-bitbucket-pipeline' => '1.5.0',
+  'blueocean-config' => '1.5.0',
+  'blueocean-dashboard' => '1.5.0',
+  'blueocean-events' => '1.5.0',
+  'blueocean-git-pipeline' => '1.5.0',
+  'blueocean-github-pipeline' => '1.5.0',
+  'blueocean-i18n' => '1.5.0',
+  'blueocean-jira' => '1.5.0',
+  'blueocean-jwt' => '1.5.0',
+  'blueocean-core-js' => '1.5.0',
+  'blueocean-personalization' => '1.5.0',
+  'blueocean-pipeline-api-impl' => '1.5.0',
+  'blueocean-pipeline-editor' => '1.5.0',
   'pipeline-milestone-step' => '1.3.1',
   'blueocean-autofavorite' => '1.2.2',
   'blueocean-display-url' => '2.2.0',
-  'blueocean-rest-impl' => '1.4.2',
-  'blueocean-pipeline-scm-api' => '1.4.2',
-  'cloudbees-bitbucket-branch-source' => '2.2.10',
-  'cloudbees-folder' => '6.3',
-  'cloud-stats' => '0.17',
+  'blueocean-rest-impl' => '1.5.0',
+  'blueocean-pipeline-scm-api' => '1.5.0',
+  'cloudbees-bitbucket-branch-source' => '2.2.11',
+  'cloudbees-folder' => '6.4',
+  'cloud-stats' => '0.18',
   'command-launcher' => '1.2',
-  'credentials-binding' => '1.15',
+  'credentials-binding' => '1.16',
   'credentials' => '2.1.16',
   'conditional-buildstep' => '1.3.6',
   'display-url-api' => '2.2.0',
   'docker-workflow' => '1.15.1',
   'docker-commons' => '1.11',
-  'durable-task' => '1.18',
-  'mailer' => '1.20',
-  'matrix-project' => '1.12',
+  'durable-task' => '1.22',
+  'mailer' => '1.21',
+  'matrix-project' => '1.13',
   'matrix-auth' => '2.2',
   'favorite' => '2.3.1',
   'git-client' => '2.7.1',
   'git' => '3.8.0',
   'github' => '1.29.0',
-  'github-branch-source' => '2.3.2',
+  'github-branch-source' => '2.3.4',
   'github-api' => '1.90',
   'git-server' => '1.7',
   'handy-uri-templates-2-api' => '2.1.6-1.0',
-  'htmlpublisher' => '1.14',
+  'htmlpublisher' => '1.16',
   'javadoc' => '1.4',
   'jackson2-api' => '2.8.11.1',
-  'jira' => '2.5',
+  'jira' => '2.5.2',
   'jsch' => '0.1.54.2',
   'junit' => '1.24',
   'jquery-detached' => '1.2.1',
-  'jenkins-design-language' => '1.4.2',
+  'jenkins-design-language' => '1.5.0',
   'linenumbers' => '1.2',
-  'pipeline-model-definition' => '1.2.7',
-  'pipeline-model-extensions' => '1.2.7',
-  'pipeline-model-api' => '1.2.7',
+  'pipeline-model-definition' => '1.2.9',
+  'pipeline-model-extensions' => '1.2.9',
+  'pipeline-model-api' => '1.2.9',
   'pipeline-graph-analysis' => '1.6',
   'pipeline-model-declarative-agent' => '1.1.1',
-  'pipeline-stage-tags-metadata' => '1.2.7',
+  'pipeline-stage-tags-metadata' => '1.2.9',
   'plain-credentials' => '1.4',
   'pubsub-light' => '1.12',
   'run-condition' => '1.0',
@@ -144,20 +144,20 @@ plugins = {
   'structs' => '1.14',
   'ssh-credentials' => '1.13',
   'ssh-slaves' => '1.26',
-  'scm-api' => '2.2.6',
-  'script-security' => '1.41',
+  'scm-api' => '2.2.7',
+  'script-security' => '1.44',
   'sse-gateway' => '1.15',
-  'token-macro' => '2.3',
+  'token-macro' => '2.5',
   'variant' => '1.1',
-  'workflow-api' => '2.26',
+  'workflow-api' => '2.27',
   'workflow-scm-step' => '2.6',
   'workflow-step-api' => '2.14',
-  'workflow-cps' => '2.45',
-  'workflow-basic-steps' => '2.6',
+  'workflow-cps' => '2.53',
+  'workflow-basic-steps' => '2.7',
   'workflow-durable-task-step' => '2.19',
-  'workflow-job' => '2.17',
+  'workflow-job' => '2.21',
   'workflow-support' => '2.18',
-  'workflow-multibranch' => '2.17',
+  'workflow-multibranch' => '2.18',
   'workflow-cps-global-lib' => '2.9',
   'mercurial' => '2.3',
   'parameterized-trigger' => '2.35.2',
@@ -182,10 +182,13 @@ end
 ## ADDITIONAL SERVER CONFIGURATION---------------------------
 
 # configure the vm agent for creating jenkins agent servers.
-include_recipe 'cb_dvo_jenkins::_vm_agent'
+# include_recipe 'cb_dvo_jenkins::_vm_agent'
 
 # install the jenkins job builder on the master jenkins server.
 include_recipe 'cb_dvo_jenkins::_jenkins_job_builder'
+
+# install azurecli for use with azure infrastructure commands.
+include_recipe 'cb_dvo_jenkins::_azure_cli'
 
 ## ACCOUNTS -------------------------------------------------
 
@@ -216,7 +219,6 @@ jenkins_script 'configure permissions' do
     instance.setSecurityRealm(hudsonRealm)
     def strategy = new GlobalMatrixAuthorizationStrategy()
     strategy.add(Jenkins.ADMINISTER, "admin")
-    strategy.add(Jenkins.ADMINISTER, "rcrawford")
     strategy.add(Jenkins.ADMINISTER, "nlocke")
     strategy.add(Jenkins.ADMINISTER, "deasland")
     strategy.add(Jenkins.ADMINISTER, "sflaherty")
@@ -227,14 +229,102 @@ jenkins_script 'configure permissions' do
   action :nothing
 end
 
+# Turns on Cross site request forgery protection.
+jenkins_script 'csrf protection' do
+  command <<-EOH.gsub(/^ {4}/, '')
+    import hudson.security.csrf.DefaultCrumbIssuer
+    import jenkins.model.Jenkins
+    def instance = Jenkins.instance
+    instance.setCrumbIssuer(new DefaultCrumbIssuer(true))
+    instance.save()
+  EOH
+  action :execute
+end
+
+jenkins_script 'jenkins protocol hardening' do
+  command <<-EOH.gsub(/^ {4}/, '')
+    // Harden Jenkins and remove all the nagging warnings in the web interface
+    import jenkins.model.Jenkins
+    import jenkins.security.s2m.*
+    Jenkins jenkins = Jenkins.getInstance()
+    // Enable Agent to master security subsystem
+    jenkins.injector.getInstance(AdminWhitelistRule.class).setMasterKillSwitch(false);
+    // Disable jnlp
+    jenkins.setSlaveAgentPort(-1);
+    // Disable old Non-Encrypted protocols
+    HashSet<String> newProtocols = new HashSet<>(jenkins.getAgentProtocols());
+    newProtocols.removeAll(Arrays.asList(
+            "JNLP3-connect", "JNLP2-connect", "JNLP-connect", "CLI-connect", "CLI2-connect"
+    ));
+    jenkins.setAgentProtocols(newProtocols);
+    jenkins.save()
+  EOH
+  action :execute
+end
+
 # Set the security enabled flag and set the run_state to use the configured private key
 ruby_block 'set the security_enabled flag' do
   block do
     node.run_state[:jenkins_private_key] = private_key # ~FC001
-    node.set['security_enabled'] = true
+    node.normal['security_enabled'] = true
     node.save
   end
   action :nothing
+end
+
+# CONFIGURE FOR KNIFE COMMANDS
+# create file for holding knife
+directory '/var/lib/jenkins/.chef' do
+  recursive true
+  owner 'jenkins'
+  group 'jenkins'
+  mode '0765'
+  action :create
+end
+
+# Set the knife.rb file for use with chef commands.
+template '/var/lib/jenkins/.chef/knife.rb' do
+  source 'knife.rb.erb'
+  owner 'jenkins'
+  group 'jenkins'
+  mode '0744'
+end
+
+# Create .pem file used by knife configuration.
+cookbook_file '/var/lib/jenkins/.chef/dvo_jenkins.pem' do
+  source 'dvo_jenkins.pem'
+  owner 'jenkins'
+  group 'jenkins'
+  mode '0644'
+end
+
+# CONFIGURE FOR ATTACHMENT TO AZURE
+# create file for holding azure credentials
+directory '/var/lib/jenkins/.azure' do
+  recursive true
+  owner 'jenkins'
+  group 'jenkins'
+  mode '0765'
+  action :create
+end
+
+template '/var/lib/jenkins/.azure/credentials' do
+  source 'credentials.erb'
+  owner 'jenkins'
+  group 'jenkins'
+  mode '0644'
+end
+
+# CONFIGURE NUMBER OF EXECUTORS
+# Set the number of executors on the master server to zero, run jobs off agents
+jenkins_script 'master_executors' do
+  command <<-GROOVY.gsub(/^ {4}/, '')
+    import jenkins.model.*
+
+    def instance = Jenkins.getInstance()
+    instance.setNumExecutors(4)
+    instance.save()
+  GROOVY
 end
 
 # NOTE Will have to remove AD authentication until groovy can work appropriately to add and remove users/groups or will allow for local user access as well.

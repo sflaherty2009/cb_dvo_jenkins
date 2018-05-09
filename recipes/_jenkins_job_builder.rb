@@ -3,19 +3,6 @@
 #
 # Copyright (c) 2017 The Authors, All Rights Reserved.
 
-# node.default['poise-python']['install_python2'] = true
-# node.default['poise-python']['options']['pip_version'] = true
-
-# git "/tmp/jenkins" do
-#     repository "git@github.com:openstack-infra/jenkins-job-builder.git"
-#     reference "master"
-#     action :sync
-# end
-
-# WILL NEED TO TEST THIS AND VERIFY IT WORKS APPROPRIATLEY.
-# node.run_state[:jenkins_username] = 'chef'
-# node.run_state[:jenkins_password] = 'Tr#kB1k3s'
-
 # Jenkins user used for jenkins build jobs
 jenkins_password_credentials node['jenkins_job_builder']['username'] do
   id node['jenkins_job_builder']['username']

@@ -1,7 +1,3 @@
-jenkins_user 'rcrawford' do
-  password    'Password#1'
-end
-
 jenkins_user 'nlocke' do
   password    'Password#2'
 end

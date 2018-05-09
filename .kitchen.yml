@@ -1,65 +1,65 @@
----
-driver:
-  name: vagrant
-
-provisioner:
-  name: chef_zero
-
-verifier:
-  name: inspec
-
-platforms:
-  - name: centos-7.3
-    transport:
-      name: ssh
-      username: vagrant
-      password: vagrant
-    driver:
-      box: bento/centos-7.3
-      network:
-        - ['private_network', {ip: '192.168.56.14'}]
-
-suites:
-  - name: default
-    run_list:
-      - recipe[cb_dvo_jenkins::default]
-    driver:
-        memory: 1024
-        cpus: 1
-
 # ---
-#   # Make sure VPN is turned on before running kitchen or SSH connection will fail.
-#   driver:
-#     name: azurerm
+# driver:
+#   name: vagrant
+
+# provisioner:
+#   name: chef_zero
+
+# verifier:
+#   name: inspec
+
+# platforms:
+#   - name: centos-7.3
+#     transport:
+#       name: ssh
+#       username: vagrant
+#       password: vagrant
+#     driver:
+#       box: bento/centos-7.3
+#       network:
+#         - ['private_network', {ip: '192.168.56.14'}]
+
+# suites:
+#   - name: default
+#     run_list:
+#       - recipe[cb_dvo_jenkins::default]
+#     driver:
+#         memory: 1024
+#         cpus: 1
+
+---
+  # Make sure VPN is turned on before running kitchen or SSH connection will fail.
+  driver:
+    name: azurerm
     
-#   # Production subscription ID. Credentials for this subscriptionj need to be established in your .azure/credentials file.
-#   driver_config:
-#     subscription_id: '9fbf7025-df40-4908-b7fb-a3a2144cee91'
-#     location: East US 2
-#     machine_size: Standard_D1
+  # Production subscription ID. Credentials for this subscriptionj need to be established in your .azure/credentials file.
+  driver_config:
+    subscription_id: '9fbf7025-df40-4908-b7fb-a3a2144cee91'
+    location: East US 2
+    machine_size: Standard_D1
   
-#   transport:
-#     ssh_key: ~/.ssh/id_rsa
+  transport:
+    ssh_key: ~/.ssh/id_rsa
   
-#   provisioner:
-#     name: chef_zero
+  provisioner:
+    name: chef_zero
   
-#   platforms:
-#     - name: centos-7.3
-#       driver_config:
-#         image_urn: OpenLogic:CentOS:7.3:latest
-#         # vnet and subnet id will work in web technology prod only. Disable otherwise.
-#         vnet_id: /subscriptions/9fbf7025-df40-4908-b7fb-a3a2144cee91/resourceGroups/AZ-RG-Network/providers/Microsoft.Network/virtualNetworks/AZ-VN-EastUS2-02
-#         subnet_id: AZ-SN-dvo
-#         vm_name: test-kitchen
-#         vm_tags:
-#           ostype: linux
-#           distro: centos
+  platforms:
+    - name: centos-7.3
+      driver_config:
+        image_urn: OpenLogic:CentOS:7.3:latest
+        # vnet and subnet id will work in web technology prod only. Disable otherwise.
+        vnet_id: /subscriptions/9fbf7025-df40-4908-b7fb-a3a2144cee91/resourceGroups/AZ-RG-Network/providers/Microsoft.Network/virtualNetworks/AZ-VN-EastUS2-02
+        subnet_id: AZ-SN-dvo
+        vm_name: test-jenkins
+        vm_tags:
+          ostype: linux
+          distro: centos
   
-#   suites:
-#     - name: default
-#       data_bags_path: "test/integration/data_bags" 
-#       run_list:
-#         - recipe[cb_dvo_jenkins::default]
-#       attributes:
+  suites:
+    - name: default
+      data_bags_path: "test/integration/data_bags" 
+      run_list:
+        - recipe[cb_dvo_jenkins::default]
+      attributes:
   
