@@ -4,15 +4,6 @@
 #
 # Copyright (c) 2017 The Authors, All Rights Reserved.
 
-## JENKINS INSTALL -------------------------------------------
-
-node.default['jenkins']['master']['jvm_options'] = '-Djenkins.install.runSetupWizard=false'
-node.default['jenkins']['master']['install_method'] = 'war'
-node.default['java']['jdk_version'] = '8'
-
-# Install aws cli
-# include_recipe 'cb_dvo_jenkins::_azure_cli'
-
 ## SECURITY --------------------------------------------------
 
 # allow for port 8080 for accessing jenkins web gui.
@@ -33,6 +24,12 @@ firewall 'default' do
   action :nothing
 end
 
+## JENKINS INSTALL -------------------------------------------
+
+node.default['jenkins']['master']['jvm_options'] = '-Djenkins.install.runSetupWizard=false'
+node.default['jenkins']['master']['install_method'] = 'war'
+node.default['java']['jdk_version'] = '8'
+
 # install jenkins with latest package.
 include_recipe 'apt'
 # Install java version 8
@@ -46,6 +43,9 @@ yum_package 'sshpass'
 
 # pull in private key from data bag contained within the cookbook (test/integration/data_bags/jenkins/keys.json)
 jenkins_auth = data_bag_item('jenkins', 'keys')
+
+# pull in credentials for use with azure credentialing.
+azure_auth = data_bag_item('jenkins', 'credentials')
 
 # add requirements to create the public key from the private key
 require 'openssl'
@@ -179,21 +179,9 @@ plugins.each_with_index do |(plugin_name, plugin_version), index|
   end
 end
 
-## ADDITIONAL SERVER CONFIGURATION---------------------------
-
-# configure the vm agent for creating jenkins agent servers.
-# include_recipe 'cb_dvo_jenkins::_vm_agent'
-
-# install the jenkins job builder on the master jenkins server.
-include_recipe 'cb_dvo_jenkins::_jenkins_job_builder'
-
-# install azurecli for use with azure infrastructure commands.
-include_recipe 'cb_dvo_jenkins::_azure_cli'
-
 ## ACCOUNTS -------------------------------------------------
 
-# Add the admin user only if it has not been added already then notify the resource
-# to configure the permissions for the admin user
+# Add the admin user only if it has not been added already
 jenkins_user 'admin' do
   password    'Tr3kbikes!1'
   public_keys [public_key]
@@ -203,13 +191,12 @@ end
 
 include_recipe 'cb_dvo_jenkins::_users'
 
-# JENKINS CONFIGURATION -----------------------------------------
-
 # Configure the permissions so that login is required and the admin user is an administrator
 # after this point the private key will be required to execute jenkins scripts (including querying
 # if users exist) so we notify the `set the security_enabled flag` resource to set this up.
 # Also note that since Jenkins 1.556 the private key cannot be used until after the admin user
 # has been added to the security realm
+# Full control once logged into box. Will need to loop back for granual access if needed in future iterations.
 jenkins_script 'configure permissions' do
   command <<-EOH.gsub(/^ {4}/, '')
     import jenkins.model.*
@@ -217,17 +204,41 @@ jenkins_script 'configure permissions' do
     def instance = Jenkins.getInstance()
     def hudsonRealm = new HudsonPrivateSecurityRealm(false)
     instance.setSecurityRealm(hudsonRealm)
-    def strategy = new GlobalMatrixAuthorizationStrategy()
-    strategy.add(Jenkins.ADMINISTER, "admin")
-    strategy.add(Jenkins.ADMINISTER, "nlocke")
-    strategy.add(Jenkins.ADMINISTER, "deasland")
-    strategy.add(Jenkins.ADMINISTER, "sflaherty")
+    def strategy = new hudson.security.FullControlOnceLoggedInAuthorizationStrategy()
+    strategy.setAllowAnonymousRead(false)
     instance.setAuthorizationStrategy(strategy)
     instance.save()
   EOH
   notifies :create, 'ruby_block[set the security_enabled flag]', :immediately
   action :nothing
 end
+
+# Granular permissions for Jenkins instance. Removed due to speed and need. 
+# jenkins_script 'configure permissions' do
+#   command <<-EOH.gsub(/^ {4}/, '')
+#     import jenkins.model.*
+#     import hudson.security.*
+#     def instance = Jenkins.getInstance()
+#     def hudsonRealm = new HudsonPrivateSecurityRealm(false)
+#     instance.setSecurityRealm(hudsonRealm)
+#     def strategy = new GlobalMatrixAuthorizationStrategy()
+#     strategy.add(Jenkins.ADMINISTER, "admin")
+#     strategy.add(Jenkins.ADMINISTER, "nlocke")
+#     strategy.add(Jenkins.ADMINISTER, "deasland")
+#     strategy.add(Jenkins.ADMINISTER, "sflaherty")
+#     strategy.add(Jenkins.ADMINISTER, "tdwight")
+#     strategy.add(Jenkins.ADMINISTER, "tuser")
+#     instance.setAuthorizationStrategy(strategy)
+#     instance.save()
+#   EOH
+#   # notifies :create, 'ruby_block[set the security_enabled flag]', :immediately
+#   action :execute
+# end
+
+# JENKINS CONFIGURATION -----------------------------------------
+
+# install azurecli for use with azure infrastructure commands.
+include_recipe 'cb_dvo_jenkins::_azure_cli'
 
 # Turns on Cross site request forgery protection.
 jenkins_script 'csrf protection' do
@@ -312,6 +323,16 @@ template '/var/lib/jenkins/.azure/credentials' do
   source 'credentials.erb'
   owner 'jenkins'
   group 'jenkins'
+  variables(
+    :prod_sub => azure_auth['production']['subscription'],
+    :prod_client_id => azure_auth['production']['client_id'],
+    :prod_client_secret => azure_auth['production']['client_secret'],
+    :prod_tenant_id => azure_auth['production']['tenant_id'],
+    :non_prod_sub => azure_auth['non_prod']['subscription'],
+    :non_prod_client_id => azure_auth['non_prod']['client_id'],
+    :non_prod_client_secret => azure_auth['non_prod']['client_secret'],
+    :non_prod_tenant_id => azure_auth['non_prod']['tenant_id']
+  )
   mode '0644'
 end
 
@@ -320,19 +341,8 @@ end
 jenkins_script 'master_executors' do
   command <<-GROOVY.gsub(/^ {4}/, '')
     import jenkins.model.*
-
     def instance = Jenkins.getInstance()
     instance.setNumExecutors(4)
     instance.save()
   GROOVY
 end
-
-# NOTE Will have to remove AD authentication until groovy can work appropriately to add and remove users/groups or will allow for local user access as well.
-## When adding AD authentication method to Jenkins box you loose the ability to use local accounts
-# This breaks chef's ability to log back into box.
-# AD authentication plugin cannot add permissions to jenkins box for AD users.
-# In order to use this plugin manual steps would need to be taken.
-# https://issues.jenkins-ci.org/browse/JENKINS-29162
-# https://github.com/jenkinsci/active-directory-plugin/blob/master/src/main/java/hudson/plugins/active_directory/ActiveDirectorySecurityRealm.java
-
-# include_recipe 'cb_dvo_jenkins::_ad_auth'
