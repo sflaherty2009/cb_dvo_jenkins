@@ -13,3 +13,7 @@ end
 jenkins_user 'tdwight' do
   password 'Password#5'
 end
+
+jenkins_user 'moleksowicz' do
+  password 'Password#6'
+end
