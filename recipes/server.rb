@@ -285,6 +285,12 @@ ruby_block 'set the security_enabled flag' do
   action :nothing
 end
 
+group 'docker' do
+  action :modify
+  members 'jenkins'
+  append true
+end
+
 # CONFIGURE FOR KNIFE COMMANDS
 # create file for holding knife
 directory '/var/lib/jenkins/.chef' do
