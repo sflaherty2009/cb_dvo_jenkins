@@ -37,7 +37,6 @@ include_recipe 'java::default'
 # Install jenkins master server
 include_recipe 'jenkins::master'
 # Install docker service
-include_recipe 'docker'
 docker_installation 'default'
 # Install git on machine for use with bitbucket pulls
 yum_package 'git'
