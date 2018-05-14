@@ -289,6 +289,11 @@ group 'docker' do
   action :modify
   members 'jenkins'
   append true
+  notifies :restart, 'service[docker]', :immediately
+end
+
+service 'docker' do
+  action :nothing
 end
 
 # CONFIGURE FOR KNIFE COMMANDS
