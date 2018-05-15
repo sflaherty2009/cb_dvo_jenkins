@@ -6,23 +6,24 @@
 
 ## SECURITY --------------------------------------------------
 
-# allow for port 8080 for accessing jenkins web gui.
-firewall_rule 'http/https' do
-  protocol :tcp
-  port 8080
-  command :allow
-end
+# This will be done by Selinux cookbook
+# # allow for port 8080 for accessing jenkins web gui.
+# firewall_rule 'http/https' do
+#   protocol :tcp
+#   port 8080
+#   command :allow
+# end
 
-# open standard ssh port
-firewall_rule 'ssh' do
-  port 22
-  command :allow
-end
+# # open standard ssh port
+# firewall_rule 'ssh' do
+#   port 22
+#   command :allow
+# end
 
-firewall 'default' do
-  enabled false
-  action :nothing
-end
+# firewall 'default' do
+#   enabled false
+#   action :nothing
+# end
 
 ## JENKINS INSTALL -------------------------------------------
 
