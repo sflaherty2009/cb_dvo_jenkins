@@ -337,14 +337,14 @@ template '/var/lib/jenkins/.azure/credentials' do
   owner 'jenkins'
   group 'jenkins'
   variables(
-    :prod_sub => azure_auth['production']['subscription'],
-    :prod_client_id => azure_auth['production']['client_id'],
-    :prod_client_secret => azure_auth['production']['client_secret'],
-    :prod_tenant_id => azure_auth['production']['tenant_id'],
-    :non_prod_sub => azure_auth['non_prod']['subscription'],
-    :non_prod_client_id => azure_auth['non_prod']['client_id'],
-    :non_prod_client_secret => azure_auth['non_prod']['client_secret'],
-    :non_prod_tenant_id => azure_auth['non_prod']['tenant_id']
+    prod_sub: azure_auth['production']['subscription'],
+    prod_client_id: azure_auth['production']['client_id'],
+    prod_client_secret: azure_auth['production']['client_secret'],
+    prod_tenant_id: azure_auth['production']['tenant_id'],
+    non_prod_sub: azure_auth['non_prod']['subscription'],
+    non_prod_client_id: azure_auth['non_prod']['client_id'],
+    non_prod_client_secret: azure_auth['non_prod']['client_secret'],
+    non_prod_tenant_id: azure_auth['non_prod']['tenant_id']
   )
   mode '0644'
 end
