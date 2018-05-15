@@ -215,7 +215,7 @@ jenkins_script 'configure permissions' do
   action :nothing
 end
 
-# Granular permissions for Jenkins instance. Removed due to speed and need. 
+# Granular permissions for Jenkins instance. Removed due to speed and need.
 # jenkins_script 'configure permissions' do
 #   command <<-EOH.gsub(/^ {4}/, '')
 #     import jenkins.model.*

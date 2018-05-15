@@ -4,7 +4,7 @@ maintainer_email 'ray_crawford@trekbikes.com'
 license 'all_rights'
 description 'Installs/Configures jenkins resources with a focus on DVO Chef Pipeline needs.'
 long_description 'See README.md'
-version '0.1.28'
+version '0.1.29'
 chef_version '>= 12.1' if respond_to?(:chef_version)
 supports 'centos'
 
