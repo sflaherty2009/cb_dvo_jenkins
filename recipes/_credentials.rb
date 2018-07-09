@@ -7,5 +7,5 @@ end
 jenkins_password_credentials 'TrekDevOps' do
   id          'TrekDevOps'
   description 'creds used for pulls/push to bitbucket'
-  password    'WQrULM66cGyPy'
+  password    'WQrULM66cGyPyB'
 end
