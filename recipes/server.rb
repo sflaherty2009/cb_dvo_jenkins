@@ -193,6 +193,7 @@ jenkins_user 'admin' do
 end
 
 include_recipe 'cb_dvo_jenkins::_users'
+include_recipe 'cb_dvo_jenkins::_credentials'
 
 # Configure the permissions so that login is required and the admin user is an administrator
 # after this point the private key will be required to execute jenkins scripts (including querying
@@ -295,6 +296,14 @@ end
 
 service 'docker' do
   action :nothing
+end
+
+directory '/standard/build' do
+  recursive true
+  owner 'jenkins'
+  group 'jenkins'
+  mode '0765'
+  action :create
 end
 
 # CONFIGURE FOR KNIFE COMMANDS
