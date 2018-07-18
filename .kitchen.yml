@@ -47,3 +47,4 @@ suites:
       chef_client:
         config:
           node_name: 'kit-tst-jnks-01'
+          chef_server_url: 'https://10.16.192.4/organizations/trek'
