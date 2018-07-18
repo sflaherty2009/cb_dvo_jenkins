@@ -2,7 +2,7 @@ current_dir = File.dirname(__FILE__)
 log_level                :info
 log_location             STDOUT
 node_name                "<%= node['chef_client']['config']['node_name'] %>"
-chef_server_url          "https://10.16.192.4/organizations/trek"
+chef_server_url          "<%= node['chef_client']['config']['chef_server_url'] %>"
 cookbook_path            ["#{current_dir}/cookbooks/"]
 ssl_verify_mode          :verify_none
 verify_api_cert          false
