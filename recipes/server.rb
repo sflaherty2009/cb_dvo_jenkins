@@ -4,27 +4,6 @@
 #
 # Copyright (c) 2017 The Authors, All Rights Reserved.
 
-## SECURITY --------------------------------------------------
-
-# This will be done by Selinux cookbook
-# # allow for port 8080 for accessing jenkins web gui.
-# firewall_rule 'http/https' do
-#   protocol :tcp
-#   port 8080
-#   command :allow
-# end
-
-# # open standard ssh port
-# firewall_rule 'ssh' do
-#   port 22
-#   command :allow
-# end
-
-# firewall 'default' do
-#   enabled false
-#   action :nothing
-# end
-
 ## JENKINS INSTALL -------------------------------------------
 
 node.default['jenkins']['master']['jvm_options'] = '-Djenkins.install.runSetupWizard=false'
@@ -37,12 +16,10 @@ include_recipe 'apt'
 include_recipe 'java::default'
 # Install jenkins master server
 include_recipe 'jenkins::master'
-# Install docker service
-docker_installation 'default'
 # Install git on machine for use with bitbucket pulls
-yum_package 'git'
-# Install git on machine for use with bitbucket pulls
-yum_package 'sshpass'
+yum_package ['git', 'sshpass']
+# Install chef dk
+chef_dk 'chef dk'
 
 # pull in private key from data bag contained within the cookbook (test/integration/data_bags/jenkins/keys.json)
 jenkins_auth = data_bag_item('jenkins', 'keys')
@@ -217,28 +194,6 @@ jenkins_script 'configure permissions' do
   action :nothing
 end
 
-# Granular permissions for Jenkins instance. Removed due to speed and need.
-# jenkins_script 'configure permissions' do
-#   command <<-EOH.gsub(/^ {4}/, '')
-#     import jenkins.model.*
-#     import hudson.security.*
-#     def instance = Jenkins.getInstance()
-#     def hudsonRealm = new HudsonPrivateSecurityRealm(false)
-#     instance.setSecurityRealm(hudsonRealm)
-#     def strategy = new GlobalMatrixAuthorizationStrategy()
-#     strategy.add(Jenkins.ADMINISTER, "admin")
-#     strategy.add(Jenkins.ADMINISTER, "nlocke")
-#     strategy.add(Jenkins.ADMINISTER, "deasland")
-#     strategy.add(Jenkins.ADMINISTER, "sflaherty")
-#     strategy.add(Jenkins.ADMINISTER, "tdwight")
-#     strategy.add(Jenkins.ADMINISTER, "tuser")
-#     instance.setAuthorizationStrategy(strategy)
-#     instance.save()
-#   EOH
-#   # notifies :create, 'ruby_block[set the security_enabled flag]', :immediately
-#   action :execute
-# end
-
 # JENKINS CONFIGURATION -----------------------------------------
 
 # install azurecli for use with azure infrastructure commands.
@@ -322,14 +277,6 @@ template '/var/lib/jenkins/.chef/knife.rb' do
   owner 'jenkins'
   group 'jenkins'
   mode '0744'
-end
-
-# Create .pem file used by knife configuration.
-cookbook_file '/var/lib/jenkins/.chef/dvo_jenkins.pem' do
-  source 'dvo_jenkins.pem'
-  owner 'jenkins'
-  group 'jenkins'
-  mode '0644'
 end
 
 # CONFIGURE FOR ATTACHMENT TO AZURE
