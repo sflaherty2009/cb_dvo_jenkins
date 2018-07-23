@@ -3,6 +3,8 @@
 default['jenkins']['master']['version'] = '2.107.3'
 # external url for the jenkins server.
 default['jenkins']['server']['url'] = 'http://jenkins-test:8080'
+# update port to run on 80 as opposed to 8080
+default['jenkins']['master']['port'] = '80'
 
 # information for azure credentials. Implements num values unless databag is available.
 default['azure_auth']['production']['subscription'] = nil
