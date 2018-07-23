@@ -1,65 +1,50 @@
-# ---
-# driver:
-#   name: vagrant
-
-# provisioner:
-#   name: chef_zero
-
-# verifier:
-#   name: inspec
-
-# platforms:
-#   - name: centos-7.3
-#     transport:
-#       name: ssh
-#       username: vagrant
-#       password: vagrant
-#     driver:
-#       box: bento/centos-7.3
-#       network:
-#         - ['private_network', {ip: '192.168.56.14'}]
-
-# suites:
-#   - name: default
-#     run_list:
-#       - recipe[cb_dvo_jenkins::default]
-#     driver:
-#         memory: 1024
-#         cpus: 1
-
 ---
-  # Make sure VPN is turned on before running kitchen or SSH connection will fail.
-  driver:
-    name: azurerm
-    
-  # Production subscription ID. Credentials for this subscriptionj need to be established in your .azure/credentials file.
-  driver_config:
-    subscription_id: '9fbf7025-df40-4908-b7fb-a3a2144cee91'
-    location: East US 2
-    machine_size: Standard_D1
+driver:
+  name: vagrant
+
+provisioner:
+  name: chef_zero
+  require_chef_omnibus: 13.8.5
+
+verifier:
+  name: inspec
   
-  transport:
-    ssh_key: ~/.ssh/id_rsa
+platforms:
+  - name: centos-7.3
+    transport:
+      name: ssh
+      username: vagrant
+      password: vagrant
+    driver:
+      box: bento/centos-7.3
+      network:
+        - ['private_network', {ip: '192.168.56.12'}]
+  - name: azure
+    transport:
+      ssh_key: ~/.ssh/id_rsa
+    driver:
+      name: azurerm
+    driver_config:
+      subscription_id: '9db13c96-62ad-4945-9579-74aeed296e48'
+      location: East US 2
+      machine_size: Standard_D1
+      image_urn: OpenLogic:CentOS:7.4:latest
+      data_disks:
+        - lun: 0
+          disk_size_gb: 979
+      vnet_id: /subscriptions/9db13c96-62ad-4945-9579-74aeed296e48/resourceGroups/AZ-RG-Network/providers/Microsoft.Network/virtualNetworks/AZ-VN-EastUS2-01
+      subnet_id: AZ-SN-back
+      vm_name: kit-tst-jnks-01
   
-  provisioner:
-    name: chef_zero
-  
-  platforms:
-    - name: centos-7.3
-      driver_config:
-        image_urn: OpenLogic:CentOS:7.3:latest
-        # vnet and subnet id will work in web technology prod only. Disable otherwise.
-        vnet_id: /subscriptions/9fbf7025-df40-4908-b7fb-a3a2144cee91/resourceGroups/AZ-RG-Network/providers/Microsoft.Network/virtualNetworks/AZ-VN-EastUS2-02
-        subnet_id: AZ-SN-dvo
-        vm_name: test-jenkins
-        vm_tags:
-          ostype: linux
-          distro: centos
-  
-  suites:
-    - name: default
-      data_bags_path: "test/integration/data_bags" 
-      run_list:
-        - recipe[cb_dvo_jenkins::default]
-      attributes:
-  
+suites:
+  - name: default
+    data_bags_path: "test/integration/data_bags" 
+    run_list:
+      - recipe[cb_dvo_addStorage::default]
+      - recipe[cb_dvo_docker::default]
+      - recipe[cb_dvo_jenkins::default]
+    attributes:
+      chef_client:
+        config:
+          node_name: 'kit-tst-jnks-01'
+          chef_server_url: 'https://10.16.192.4/organizations/trek'
