@@ -17,7 +17,7 @@ include_recipe 'java::default'
 # Install jenkins master server
 include_recipe 'jenkins::master'
 # Install git on machine for use with bitbucket pulls
-yum_package ['git', 'sshpass']
+yum_package %w(git sshpass)
 # Install chef dk
 chef_dk 'chef dk'
 
