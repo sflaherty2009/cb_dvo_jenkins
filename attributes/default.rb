@@ -7,6 +7,8 @@ default['jenkins']['server']['url'] = 'http://jenkins-test:8080'
 default['jenkins']['master']['host'] = 'localhost'
 default['jenkins']['master']['port'] = '80'
 default['jenkins']['master']['endpoint'] = "http://#{node['jenkins']['master']['host']}:#{node['jenkins']['master']['port']}"
+# update timeout to 480 seconds
+default['jenkins']['executor']['timeout'] = '480'
 
 # information for azure credentials. Implements num values unless databag is available.
 default['azure_auth']['production']['subscription'] = nil
