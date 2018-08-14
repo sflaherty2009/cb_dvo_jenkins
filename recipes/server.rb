@@ -142,7 +142,7 @@ plugins = {
   'mercurial' => '2.4',
   'parameterized-trigger' => '2.35.2',
   'pipeline-stage-step' => '2.3',
-  'pipeline-build-step' => '2.9',
+  'pipeline-build-step' => '2.7',
   'pipeline-input-step' => '2.8',
 }
 
