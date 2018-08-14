@@ -134,15 +134,15 @@ plugins = {
   'workflow-step-api' => '2.16',
   'workflow-cps' => '2.54',
   'workflow-basic-steps' => '2.9',
-  'workflow-durable-task-step' => '2.19',
+  'workflow-durable-task-step' => '2.20',
   'workflow-job' => '2.24',
   'workflow-support' => '2.20',
   'workflow-multibranch' => '2.20',
   'workflow-cps-global-lib' => '2.9',
-  'mercurial' => '2.3',
+  'mercurial' => '2.4',
   'parameterized-trigger' => '2.35.2',
   'pipeline-stage-step' => '2.3',
-  'pipeline-build-step' => '2.7',
+  'pipeline-build-step' => '2.9',
   'pipeline-input-step' => '2.8',
 }
 
