@@ -56,6 +56,7 @@ plugins = {
   'azure-vm-agents' => '0.7.3',
   'apache-httpcomponents-client-4-api' => '4.5.5-3.0',
   'bitbucket' => '1.1.8',
+  'bitbucket-pullrequest-builder' => '1.4.26',
   'bouncycastle-api' => '2.16.3',
   'branch-api' => '2.0.20',
   'blueocean' => '1.7.2',
