@@ -21,28 +21,8 @@ yum_package %w(git sshpass)
 # Install chef dk
 chef_dk 'chef dk'
 
-# pull in private key from data bag contained within the cookbook (test/integration/data_bags/jenkins/keys.json)
-jenkins_auth = data_bag_item('jenkins', 'keys')
-
 # pull in credentials for use with azure credentialing.
 azure_auth = data_bag_item('jenkins', 'credentials')
-
-# add requirements to create the public key from the private key
-require 'openssl'
-require 'net/ssh'
-
-# create our public key on the chef system itself so that no one can access the account or have access to the key.
-key = OpenSSL::PKey::RSA.new(jenkins_auth['private_key'])
-private_key = key.to_pem
-public_key = "#{key.ssh_type} #{[key.to_blob].pack('m0')}"
-
-# Set jenkins private key only if security is not enabled.
-ruby_block 'set jenkins private key' do
-  block do
-    node.run_state[:jenkins_private_key] = private_key # ~FC001
-  end
-  only_if { node.attribute?('security_enabled') }
-end
 
 ## PLUG-INS -------------------------------------------------
 
@@ -51,6 +31,7 @@ plugins = {
   'maven-plugin' => '3.1.2',
   'azure-commons' => '0.2.6',
   'ace-editor' => '1.1',
+  'active-directory' => '2.8',
   'authentication-tokens' => '1.3',
   'azure-credentials' => '1.6.0',
   'azure-vm-agents' => '0.7.3',
@@ -161,39 +142,13 @@ plugins.each_with_index do |(plugin_name, plugin_version), index|
 end
 
 ## ACCOUNTS -------------------------------------------------
+include_recipe 'cb_dvo_jenkins::_ad_auth'
 
-# Add the admin user only if it has not been added already
-jenkins_user 'admin' do
-  password    'Tr3kbikes!1'
-  public_keys [public_key]
-  not_if { node.attribute?('security_enabled') }
-  notifies :execute, 'jenkins_script[configure permissions]', :immediately
-end
+# User inclusion will come from Active Directory, will not need to manually add users.
+# include_recipe 'cb_dvo_jenkins::_users'
 
-include_recipe 'cb_dvo_jenkins::_users'
-include_recipe 'cb_dvo_jenkins::_credentials'
-
-# Configure the permissions so that login is required and the admin user is an administrator
-# after this point the private key will be required to execute jenkins scripts (including querying
-# if users exist) so we notify the `set the security_enabled flag` resource to set this up.
-# Also note that since Jenkins 1.556 the private key cannot be used until after the admin user
-# has been added to the security realm
-# Full control once logged into box. Will need to loop back for granual access if needed in future iterations.
-jenkins_script 'configure permissions' do
-  command <<-EOH.gsub(/^ {4}/, '')
-    import jenkins.model.*
-    import hudson.security.*
-    def instance = Jenkins.getInstance()
-    def hudsonRealm = new HudsonPrivateSecurityRealm(false)
-    instance.setSecurityRealm(hudsonRealm)
-    def strategy = new hudson.security.FullControlOnceLoggedInAuthorizationStrategy()
-    strategy.setAllowAnonymousRead(false)
-    instance.setAuthorizationStrategy(strategy)
-    instance.save()
-  EOH
-  notifies :create, 'ruby_block[set the security_enabled flag]', :immediately
-  action :nothing
-end
+# Testing if this is the only failure we are seeing.
+# include_recipe 'cb_dvo_jenkins::_credentials'
 
 # JENKINS CONFIGURATION -----------------------------------------
 
@@ -231,16 +186,6 @@ jenkins_script 'jenkins protocol hardening' do
     jenkins.save()
   EOH
   action :execute
-end
-
-# Set the security enabled flag and set the run_state to use the configured private key
-ruby_block 'set the security_enabled flag' do
-  block do
-    node.run_state[:jenkins_private_key] = private_key # ~FC001
-    node.normal['security_enabled'] = true
-    node.save
-  end
-  action :nothing
 end
 
 group 'docker' do
