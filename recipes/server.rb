@@ -24,6 +24,9 @@ chef_dk 'chef dk'
 # pull in credentials for use with azure credentialing.
 azure_auth = data_bag_item('jenkins', 'credentials')
 
+## ACCOUNTS/SECURITY -------------------------------------------------
+include_recipe 'cb_dvo_jenkins::_ad_auth'
+
 ## PLUG-INS -------------------------------------------------
 
 # list of plugins needed for the chef jenkins server.
@@ -141,15 +144,6 @@ plugins.each_with_index do |(plugin_name, plugin_version), index|
     end
   end
 end
-
-## ACCOUNTS -------------------------------------------------
-include_recipe 'cb_dvo_jenkins::_ad_auth'
-
-# User inclusion will come from Active Directory, will not need to manually add users.
-# include_recipe 'cb_dvo_jenkins::_users'
-
-# Testing if this is the only failure we are seeing.
-# include_recipe 'cb_dvo_jenkins::_credentials'
 
 # JENKINS CONFIGURATION -----------------------------------------
 
