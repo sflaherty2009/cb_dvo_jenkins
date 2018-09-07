@@ -26,7 +26,6 @@ end
 # Add the admin user only if it has not been added already then notify the resource
 # to configure the permissions for the admin user
 jenkins_user 'admin' do
-  password    'Tr3kbikes!1'
   public_keys [public_key]
   not_if { node.attribute?('security_enabled') }
   notifies :execute, 'jenkins_script[configure permissions]', :immediately
