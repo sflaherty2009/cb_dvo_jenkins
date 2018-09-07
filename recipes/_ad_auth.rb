@@ -17,7 +17,6 @@ plugins = {
 plugins.each_with_index do |(plugin_name, plugin_version), index|
   jenkins_plugin plugin_name do
     version plugin_version
-    install_deps false
     action :install
     # only restart on the final plugin
     if index == (plugins.size - 1)
