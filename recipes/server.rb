@@ -126,6 +126,7 @@ plugins = {
   'pipeline-stage-step' => '2.3',
   'pipeline-build-step' => '2.7',
   'pipeline-input-step' => '2.8',
+  'versionnumber' => '1.9',
 }
 
 # run each plugin once with the version given to it. Do not run dependencies. Notify restart on the service only if it's the last plugin.
