@@ -8,7 +8,7 @@
 require 'openssl'
 require 'net/ssh'
 
-# Install active directory plugin for use with authentication. 
+# Install active directory plugin for use with authentication.
 plugins = {
   'active-directory' => '2.8',
 }
