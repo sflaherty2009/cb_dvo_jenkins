@@ -8,6 +8,25 @@
 require 'openssl'
 require 'net/ssh'
 
+# Install active directory plugin for use with authentication. 
+plugins = {
+  'active-directory' => '2.8',
+}
+
+# run each plugin once with the version given to it. Do not run dependencies. Notify restart on the service only if it's the last plugin.
+plugins.each_with_index do |(plugin_name, plugin_version), index|
+  jenkins_plugin plugin_name do
+    version plugin_version
+    install_deps false
+    action :install
+    # only restart on the final plugin
+    if index == (plugins.size - 1)
+      notifies :restart, 'runit_service[jenkins]', :immediately
+    end
+  end
+end
+
+# pull down data bag item used for creation of public/private key to allow chef user to bypass auth.
 jenkins_keys = data_bag_item('jenkins', 'keys')
 
 key = OpenSSL::PKey::RSA.new(jenkins_keys['private_key'])

@@ -34,7 +34,6 @@ plugins = {
   'maven-plugin' => '3.1.2',
   'azure-commons' => '0.2.6',
   'ace-editor' => '1.1',
-  'active-directory' => '2.8',
   'authentication-tokens' => '1.3',
   'azure-credentials' => '1.6.0',
   'azure-vm-agents' => '0.7.3',
