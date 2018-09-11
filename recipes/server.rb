@@ -26,6 +26,7 @@ azure_auth = data_bag_item('jenkins', 'credentials')
 
 ## ACCOUNTS/SECURITY -------------------------------------------------
 include_recipe 'cb_dvo_jenkins::_ad_auth'
+include_recipe 'cb_dvo_jenkins::_credentials'
 
 ## PLUG-INS -------------------------------------------------
 
