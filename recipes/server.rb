@@ -230,10 +230,10 @@ directory '/var/lib/jenkins/.azure' do
   action :create
 end
 
-file '/var/run/docker.sock' do
-  mode '0777'
-  action :create
-end
+# file '/var/run/docker.sock' do
+#   mode '0777'
+#   action :create
+# end
 
 template '/var/lib/jenkins/.azure/credentials' do
   source 'credentials.erb'
