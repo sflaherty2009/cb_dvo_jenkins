@@ -10,6 +10,12 @@ jenkins_password_credentials 'conWeb' do
   password    'C7HSI+J1Ro7Fz7pnzS7me2mm4zitJEAk'
 end
 
+jenkins_password_credentials 'conSolr' do
+  id          'consolr'
+  description 'creds for use by web container storage'
+  password    'ADp/Ez4b+9sXHUv918ZtgBEqVGQTHL4M'
+end
+
 jenkins_password_credentials 'TrekDevOps' do
   id          'TrekDevOps'
   description 'creds used for pulls/push to bitbucket'
