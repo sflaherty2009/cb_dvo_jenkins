@@ -4,6 +4,12 @@ jenkins_password_credentials 'conHybris' do
   password    'sMM3oPIUwy8BsiSnke/A57NTKPqUX0Vs'
 end
 
+jenkins_password_credentials 'conWeb' do
+  id          'conWeb'
+  description 'creds for use by web container storage'
+  password    'C7HSI+J1Ro7Fz7pnzS7me2mm4zitJEAk'
+end
+
 jenkins_password_credentials 'TrekDevOps' do
   id          'TrekDevOps'
   description 'creds used for pulls/push to bitbucket'
