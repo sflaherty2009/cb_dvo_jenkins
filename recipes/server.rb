@@ -6,7 +6,7 @@
 
 ## JENKINS INSTALL -------------------------------------------
 
-node.default['jenkins']['master']['jvm_options'] = '-Djenkins.install.runSetupWizard=false'
+node.default['jenkins']['master']['jvm_options'] = '-Djenkins.install.runSetupWizard=false -Dorg.jenkinsci.plugins.durabletask.BourneShellScript.HEARTBEAT_CHECK_INTERVAL=300 -Djava.awt.headless=true'
 node.default['jenkins']['master']['install_method'] = 'war'
 node.default['java']['jdk_version'] = '8'
 
@@ -25,8 +25,8 @@ chef_dk 'chef dk'
 azure_auth = data_bag_item('jenkins', 'credentials')
 
 ## ACCOUNTS/SECURITY -------------------------------------------------
+# ad_auth recipe needs to go first in order to appropriately set the Jenkins permissions for rest of the runs.
 include_recipe 'cb_dvo_jenkins::_ad_auth'
-include_recipe 'cb_dvo_jenkins::_credentials'
 
 ## PLUG-INS -------------------------------------------------
 
@@ -108,7 +108,7 @@ plugins = {
   'slack' => '2.3',
   'structs' => '1.14',
   'ssh-credentials' => '1.14',
-  'ssh-slaves' => '1.26',
+  'ssh-slaves' => '1.28.1',
   'scm-api' => '2.2.7',
   'script-security' => '1.44',
   'sse-gateway' => '1.15',
@@ -149,6 +149,7 @@ end
 
 # install azurecli for use with azure infrastructure commands.
 include_recipe 'cb_dvo_jenkins::_azure_cli'
+include_recipe 'cb_dvo_jenkins::_vm_agent'
 
 # Turns on Cross site request forgery protection.
 jenkins_script 'csrf protection' do
@@ -252,13 +253,7 @@ template '/var/lib/jenkins/.azure/credentials' do
   mode '0644'
 end
 
-# CONFIGURE NUMBER OF EXECUTORS
-# Set the number of executors on the master server to zero, run jobs off agents
-jenkins_script 'master_executors' do
-  command <<-GROOVY.gsub(/^ {4}/, '')
-    import jenkins.model.*
-    def instance = Jenkins.getInstance()
-    instance.setNumExecutors(4)
-    instance.save()
-  GROOVY
-end
+# ADD SERVICE ACCOUNTS
+# Moved credentials recipe to end of server execution, Jenkins needs to be restarted before credentials are created.
+include_recipe 'cb_dvo_jenkins::_credentials'
+include_recipe 'cb_dvo_jenkins::_jenkins_jobs'
