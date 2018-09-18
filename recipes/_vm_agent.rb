@@ -6,15 +6,14 @@
 
 # Recipe used for automatically deploying azure agents on server utilization
 # underscore placed in front of recipe name because it should not be run standalone.
+azure_auth = data_bag_item('jenkins', 'credentials')
 
 jenkins_password_credentials 'jenkinsAdmin' do
   id          'jenkinsAdmin'
   description 'creds for use by jenkins agents'
-  password    'TrekDevOpzR0ckz!'
+  password    azure_auth['agent']['password']
   notifies :execute, 'jenkins_script[master_executors]', :immediately
 end
-
-azure_auth = data_bag_item('jenkins', 'credentials')
 
 # Set the number of executors on the master server to zero, run jobs off agents
 jenkins_script 'master_executors' do

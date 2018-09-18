@@ -65,8 +65,7 @@
         }
     }
 }
-
-// Should do continued work on FROM, allowing this to be dictated in Jenkins prompts. 
+ 
 </script>
     <sandbox>true</sandbox>
   </definition>

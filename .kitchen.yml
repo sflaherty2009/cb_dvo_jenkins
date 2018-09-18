@@ -39,6 +39,7 @@ platforms:
 suites:
   - name: default
     data_bags_path: "test/integration/data_bags" 
+    encrypted_data_bag_secret_key_path: "test/smoke/default/jenkins_secret"
     run_list:
       - recipe[cb_dvo_addStorage::default]
       - recipe[cb_dvo_docker::default]
