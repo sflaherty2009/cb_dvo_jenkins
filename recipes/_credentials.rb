@@ -1,29 +1,31 @@
+azure_auth = data_bag_item('jenkins', 'credentials')
+
 jenkins_password_credentials 'conHybris' do
   id          'conHybris'
   description 'creds for use by hybris container storage'
-  password    'sMM3oPIUwy8BsiSnke/A57NTKPqUX0Vs'
+  password    azure_auth['service_accounts']['conHybris']
 end
 
 jenkins_password_credentials 'conWeb' do
   id          'conWeb'
   description 'creds for use by web container storage'
-  password    'C7HSI+J1Ro7Fz7pnzS7me2mm4zitJEAk'
+  password    azure_auth['service_accounts']['conWeb']
 end
 
 jenkins_password_credentials 'conSolr' do
   id          'consolr'
   description 'creds for use by web container storage'
-  password    'ADp/Ez4b+9sXHUv918ZtgBEqVGQTHL4M'
+  password    azure_auth['service_accounts']['consolr']
 end
 
 jenkins_password_credentials 'TrekDevOps' do
   id          'TrekDevOps'
   description 'creds used for pulls/push to bitbucket'
-  password    'WQrULM66cGyPyB'
+  password    azure_auth['service_accounts']['TrekDevOps']
 end
 
 jenkins_password_credentials 'conBase' do
   id          'conBase'
   description 'creds for use by base container storage'
-  password    'NrD6bvZ4w7Xjk0TA6KYkfT5se/kiQErD'
+  password    azure_auth['service_accounts']['conBase']
 end

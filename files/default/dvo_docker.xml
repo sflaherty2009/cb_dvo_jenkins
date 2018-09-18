@@ -1,0 +1,74 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.24">
+  <actions/>
+  <description></description>
+  <displayName>Hybris Manual Container Build</displayName>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+      <triggers/>
+    </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.54">
+    <script>node {
+    slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;#00FF00&apos;, message: &quot;Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER} : build has started&quot;, teamDomain: &apos;trekbikes&apos;, token: &apos;kObSFnU4ZWOqaEJWSwWgr9K8&apos;
+    stage(&apos;Pulling Commit Information&apos;){
+        // Determine which environment this will be built in. 
+        environment = input(
+            id: &apos;environment&apos;, message: &apos;User input required&apos;, ok: &apos;ok&apos;, parameters: [choice(name: &apos;environment&apos;, choices: &apos;dev2\ne2e\nmadone\nproofing\ndomane\ntopfuel\ntest\nprod&apos;, description: &apos;What environment are we building for?&apos;)])
+        version = input(
+            id: &apos;version&apos;, message: &apos;input the version for the environment: &apos;, ok: &apos;ok&apos;, parameters: [string(defaultValue: &apos;master&apos;, description: &apos;.....&apos;, name: &apos;LIB_TEST&apos;)])
+        base_version = input(
+            id: &apos;base_version&apos;, message: &apos;input version of the base container: &apos;, ok: &apos;ok&apos;, parameters: [string(defaultValue: &apos;master&apos;, description: &apos;.....&apos;, name: &apos;LIB_TEST&apos;)])
+            
+            git credentialsId: &quot;TrekDevOps&quot;, url: &apos;https://bitbucket.org/trekbikes/tbc.git&apos;, branches: [[name: &quot;${version}&quot;]]
+            GIT_COMMIT_HASH = sh (script: &quot;git --git-dir=.git log -1 | head -n 4&quot;, returnStdout: true)
+
+            slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;#00FF00&apos;, message: &quot;Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER} : ${GIT_COMMIT_HASH}&quot;, teamDomain: &apos;trekbikes&apos;, token: &apos;kObSFnU4ZWOqaEJWSwWgr9K8&apos;
+    }
+    // pull down registry locations for the new container and the old container.
+    stage(&apos;Checkout from Bitbucket&apos;) {
+        // Try to pull repository from git, fail if pull fails. Send slack message if successful.
+        try{
+            // Pull git repository down for environment
+            git credentialsId: &quot;TrekDevOps&quot;, url: &apos;https://bitbucket.org/trekbikes/dvo-docker.git&apos;, branch: &apos;master&apos;
+            // Send a slack message for the git pull 
+            slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;#00FF00&apos;, message: &quot;Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER} : dvo-docker pull successful&quot;, teamDomain: &apos;trekbikes&apos;, token: &apos;kObSFnU4ZWOqaEJWSwWgr9K8&apos;
+        }
+        // Catch any failure in git pull and send message through slack.
+        catch(Exception e){
+            // send slack message for git pull failure
+            slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;#FF0000&apos;, message: &quot;Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER} : dvo-docker pull was not successful&quot;, teamDomain: &apos;trekbikes&apos;, token: &apos;kObSFnU4ZWOqaEJWSwWgr9K8&apos;
+            // send error message for failure
+            error(&quot;git pull was not successful&quot;)
+        }
+    }
+    stage(&apos;Build and Push to Azure Container Registry&apos;) {
+        slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;#00FF00&apos;, message: &quot;Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER} : building for ${environment} - ${version}&quot;, teamDomain: &apos;trekbikes&apos;, token: &apos;kObSFnU4ZWOqaEJWSwWgr9K8&apos;
+        // Attempt to build the container and push it to azure container store.
+        try{
+            // pull base hybris image and try to build and push hybris container with TBC code.
+            docker.withRegistry(&apos;https://conhybris.azurecr.io&apos;, &apos;conHybris&apos;){
+                sh &quot;docker login conbase.azurecr.io -u conBase -p NrD6bvZ4w7Xjk0TA6KYkfT5se/kiQErD&quot;
+                def appdev = docker.build(&quot;conhybris.azurecr.io/hybris-${environment}&quot;, &quot;--no-cache --build-arg TBC_VERSION=${version} --build-arg PENV=${environment} --build-arg IMAGE_NAME=conbase.azurecr.io/hybris:${base_version} .&quot;)
+                tag = VersionNumber (versionNumberString: &apos;${BUILD_DATE_FORMATTED, &quot;yyyyMMdd&quot;}.${BUILDS_TODAY}.${BUILD_NUMBER}&apos;)
+                appdev.push(&quot;${tag}&quot;)
+                appdev.push(&apos;latest&apos;)
+                slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;#00FF00&apos;, message: &quot;Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER} : docker push of conhybris.azurecr.io/hybris-${environment}:latest was successful&quot;, teamDomain: &apos;trekbikes&apos;, token: &apos;kObSFnU4ZWOqaEJWSwWgr9K8&apos;
+            }
+        }
+        catch(Exception e){
+            // send slack message for docker build failure
+            slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;#FF0000&apos;, message: &quot;Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER} : docker build of docker push of conhybris.azurecr.io/hybris-${environment} was not successful&quot;, teamDomain: &apos;trekbikes&apos;, token: &apos;kObSFnU4ZWOqaEJWSwWgr9K8&apos;
+            // send error message for failure
+            error(&quot;docker build/push was not successful&quot;)
+        }
+    }
+}
+ 
+</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>
