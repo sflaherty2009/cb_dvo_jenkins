@@ -1,0 +1,66 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.11.2">
+  <actions/>
+  <description></description>
+  <displayName>Bump Web Heads ARM</displayName>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>environment</name>
+          <description>Environment where you would like to bump the web heads.  Executing on PRODUCTION will turn on and off web-prod servers one at a time.</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>prodarm</string>
+              <string>testarm</string>
+              <string>dev</string>
+              <string>madone</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+    <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+      <triggers/>
+    </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.41">
+    <script>def loop_of_servers(servers, environment){
+    servers.each { server -&gt;
+        sh &quot;ssh sljenkins@${server} \&quot;sudo docker stop web-${environment} &amp;&amp; sudo docker start web-${environment}\&quot;&quot;
+        slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;#00FF00&apos;, message: &quot;bumping webheads for ${env.environment}&quot;, teamDomain: &apos;trekbikes&apos;, token: &apos;dVxfSjNzkVhjE9ZSgkRfPsmJ&apos;
+        echo &quot;bumping ${server} in ${environment}&quot;
+    }
+}
+
+node{
+    if (env.environment == &quot;prodarm&quot;){
+        servers = [&apos;azl-prd-web-01.trek.web&apos;, &apos;azl-prd-web-02.trek.web&apos;, &apos;azl-prd-web-03.trek.web&apos;]
+        website = [&quot;www.trekbikes.com&quot;]
+        component = &quot;34p3jb2bzz44&quot;
+    }
+    if (env.environment == &apos;dev&apos;){
+        servers = [&quot;azl-dev-web-01-az-rg-e2e-dvo1828-lin.eastus2.cloudapp.azure.com&quot;]
+        website = [&quot;dev.trekbikes.com&quot;]
+        component = &quot;lskyp6rd2gb0&quot;
+    }
+    if (env.environment == &apos;testarm&apos;){
+        servers = [&apos;azl-tst-web-01.trek.web&apos;, &apos;azl-tst-web-02.trek.web&apos;, &apos;azl-tst-web-03.trek.web&apos;]
+        website = [&quot;https://www.test.trekbikes.com&quot;]
+        component = &quot;y9v9q643h989&quot;
+    }
+    if (env.environment == &apos;madone&apos;){
+        servers = [&quot;azl-mdn-web-01.trek.web&quot;]
+        website = [&quot;madone.trekbikes.com&quot;]
+        component = &quot;2h3ggb5llgtb&quot;
+    }
+    stage(&apos;bumping web heads&apos;){
+        loop_of_servers(servers, env.environment)
+    }
+}</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>

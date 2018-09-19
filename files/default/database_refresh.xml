@@ -1,0 +1,52 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.11.2">
+  <actions/>
+  <description></description>
+  <displayName>Hybris Database Refresh</displayName>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>Version</name>
+          <description>Database version</description>
+          <defaultValue></defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>Environment</name>
+          <description>Environment to restore</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>dev</string>
+              <string>dev2</string>
+              <string>dmn</string>
+              <string>e2e</string>
+              <string>prf</string>
+              <string>mdn</string>
+              <string>tf</string>
+              <string>tst</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+    <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+      <triggers/>
+    </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.41">
+    <script>node {
+    stage(&apos;Update Version Attribute&apos;) {
+        sh &quot;knife exec -E &apos;nodes.find(\&quot;name:azw-${env.Environment}-sql-01\&quot;) {|n| n.normal[\&quot;dvo_user\&quot;][\&quot;hybDatabase\&quot;][\&quot;db_version\&quot;]=\&quot;${env.Version}\&quot;; n.save}&apos;&quot;
+    }
+        
+    stage(&apos;Kick-off DB Refresh&apos;) {
+        sh &quot;knife winrm \&quot;name:azw-${env.Environment}-sql-01\&quot; \&quot;chef-client -o cb_dvo_hybDatabase::refresh\&quot; --winrm-user local_admin --winrm-password &apos;R0llW1th!t&apos;&quot;
+    }
+}</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>

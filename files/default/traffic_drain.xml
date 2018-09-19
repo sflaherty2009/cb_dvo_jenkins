@@ -1,0 +1,93 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.11.2">
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>environment</name>
+          <description>Environment where you would like to drain traffic from a hybris content node.</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>prod</string>
+              <string>test</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>drain</name>
+          <description>Enable or disable draining?</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>enable</string>
+              <string>disable</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>hybrisNode</name>
+          <description>Which node?</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>hyb-02</string>
+              <string>hyb-03</string>
+              <string>hyb-04</string>
+              <string>hyb-05</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+    <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+      <triggers/>
+    </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.41">
+    <script>//Version 0.0.1
+def drain_on(servers, hybrisNode, prefix){
+    servers.each { server -&gt;
+        sh &quot;&quot;&quot;
+            nonce=`curl -s -u &quot;devops:d3v0psR0cks&quot;\\!&quot;&quot; &quot;${server}.trek.web:6969/balancer-manager&quot; | grep nonce | grep &quot;hybris-content-ssl&quot; | sed &quot;s/.*nonce=\\(.*\\)[&apos;\\&quot;].*/\\1/&quot; | tail -n 1`;
+            `curl -s -o /dev/null -XPOST &quot;http://${server}.trek.web:6969/balancer-manager?&quot; -d b=&quot;hybris-content-ssl&quot; -d w=&quot;ajp://${prefix}${hybrisNode}&quot; -d nonce=&quot;\$nonce&quot; -d w_status_N=1 --user devops:d3v0psR0cks\\!`
+        &quot;&quot;&quot;
+    }
+}
+
+def drain_off(servers, hybrisNode, prefix) {
+    servers.each { server -&gt;
+        sh &quot;&quot;&quot;
+            nonce=`curl -s -u &quot;devops:d3v0psR0cks&quot;\\!&quot;&quot; &quot;${server}.trek.web:6969/balancer-manager&quot; | grep nonce | grep &quot;hybris-content-ssl&quot; | sed &quot;s/.*nonce=\\(.*\\)[&apos;\\&quot;].*/\\1/&quot; | tail -n 1`;
+            `curl -s -o /dev/null -XPOST &quot;http://${server}.trek.web:6969/balancer-manager?&quot; -d b=&quot;hybris-content-ssl&quot; -d w=&quot;ajp://${prefix}${hybrisNode}&quot; -d nonce=&quot;\$nonce&quot; -d w_status_N=0 --user devops:d3v0psR0cks\\!`
+        &quot;&quot;&quot;
+    }
+}
+
+node{
+    if (env.environment == &quot;prod&quot;){
+        servers = [&apos;azl-prd-web-01&apos;,&apos;azl-prd-web-02&apos;,&apos;azl-prd-web-03&apos;]
+        prefix = &quot;azl-prd-&quot;
+    }
+    if (env.environment == &apos;test&apos;){
+        servers = [&apos;azl-tst-web-01&apos;,&apos;azl-tst-web-02&apos;,&apos;azl-tst-web-03&apos;]
+        prefix = &quot;azl-tst-&quot;
+    }
+
+    stage(&apos;enabling/disabling draining&apos;){
+        if (env.drain == &quot;enable&quot;){
+            //slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;#00FF00&apos;, message: &quot;Enabling traffic drain on ${env.hybrisNode}.&quot;, teamDomain: &apos;trekbikes&apos;, token: &apos;dVxfSjNzkVhjE9ZSgkRfPsmJ&apos;
+            drain_on(servers, env.hybrisNode, prefix)
+        }
+        if (env.drain == &quot;disable&quot;){
+            //slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;#00FF00&apos;, message: &quot;Disabling traffic drain on ${env.hybrisNode}.&quot;, teamDomain: &apos;trekbikes&apos;, token: &apos;dVxfSjNzkVhjE9ZSgkRfPsmJ&apos;
+            drain_off(servers, env.hybrisNode, prefix)
+        }
+    }
+    
+}</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>
