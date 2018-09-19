@@ -146,9 +146,6 @@ plugins.each_with_index do |(plugin_name, plugin_version), index|
 end
 
 # JENKINS CONFIGURATION -----------------------------------------
-
-# install azurecli for use with azure infrastructure commands.
-include_recipe 'cb_dvo_jenkins::_azure_cli'
 include_recipe 'cb_dvo_jenkins::_vm_agent'
 
 # Turns on Cross site request forgery protection.
