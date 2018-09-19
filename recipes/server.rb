@@ -18,8 +18,6 @@ include_recipe 'java::default'
 include_recipe 'jenkins::master'
 # Install git on machine for use with bitbucket pulls
 yum_package %w(git sshpass)
-# Install chef dk
-chef_dk 'chef dk'
 
 # pull in credentials for use with azure credentialing.
 azure_auth = data_bag_item('jenkins', 'credentials')
