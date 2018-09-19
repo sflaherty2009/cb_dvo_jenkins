@@ -1,7 +1,7 @@
 {
   "cb_dvo_jenkins": {
-      "production": "0.2.0",
-      "staging": "0.2.0",
-      "testing": "0.2.0"
+      "production": "0.2.2",
+      "staging": "0.2.2",
+      "testing": "0.2.2"
   }
 }
