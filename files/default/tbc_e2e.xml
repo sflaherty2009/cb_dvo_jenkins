@@ -1,5 +1,6 @@
 <?xml version='1.1' encoding='UTF-8'?>
 <flow-definition plugin="workflow-job@2.24">
+  <actions/>
   <description></description>
   <displayName>Hybris E2E Container Build</displayName>
   <keepDependencies>false</keepDependencies>
@@ -9,6 +10,10 @@
         <com.cloudbees.jenkins.plugins.BitBucketTrigger plugin="bitbucket@1.1.8">
           <spec></spec>
         </com.cloudbees.jenkins.plugins.BitBucketTrigger>
+        <hudson.triggers.SCMTrigger>
+          <spec>* * * * *</spec>
+          <ignorePostCommitHooks>false</ignorePostCommitHooks>
+        </hudson.triggers.SCMTrigger>
       </triggers>
     </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
   </properties>
