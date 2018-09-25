@@ -29,3 +29,9 @@ jenkins_password_credentials 'conBase' do
   description 'creds for use by base container storage'
   password    azure_auth['service_accounts']['conBase']
 end
+
+jenkins_password_credentials 'conApacheMaintenance' do
+  id          'conApacheMaintenance'
+  description 'creds for use by base container storage'
+  password    azure_auth['service_accounts']['conApacheMaintenance']
+end
