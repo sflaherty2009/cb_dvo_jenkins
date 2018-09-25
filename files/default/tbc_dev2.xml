@@ -10,10 +10,6 @@
         <com.cloudbees.jenkins.plugins.BitBucketTrigger plugin="bitbucket@1.1.8">
           <spec></spec>
         </com.cloudbees.jenkins.plugins.BitBucketTrigger>
-        <hudson.triggers.SCMTrigger>
-          <spec>* * * * *</spec>
-          <ignorePostCommitHooks>false</ignorePostCommitHooks>
-        </hudson.triggers.SCMTrigger>
       </triggers>
     </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
   </properties>
