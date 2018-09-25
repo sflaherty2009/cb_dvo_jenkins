@@ -1,4 +1,4 @@
-jobs = %w(con_base_Hybris tbc dvo_docker con_base_solr sonarqube dvo_wcpweb2 traffic_drain bump_web_heads database_refresh tbc_dev2 tbc_e2e maintenance_page tbc_domane tbc_test)
+jobs = %w(con_base_Hybris tbc dvo_docker con_base_solr sonarqube dvo_wcpweb2 traffic_drain bump_web_heads database_refresh tbc_dev2 tbc_e2e maintenance_page tbc_domane tbc_test con_base_maintenance)
 
 jobs.each do |job|
   cookbook_file "#{Chef::Config[:file_cache_path]}/#{job}.xml" do
