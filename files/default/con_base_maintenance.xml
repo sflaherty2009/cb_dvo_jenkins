@@ -2,7 +2,7 @@
 <flow-definition plugin="workflow-job@2.24">
   <actions/>
   <description></description>
-  <displayName>Maintenance Base Container Build</displayName>
+  <displayName>Web Maintenance Base Container Build</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
     <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
