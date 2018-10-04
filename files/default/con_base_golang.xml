@@ -1,8 +1,7 @@
 <?xml version='1.1' encoding='UTF-8'?>
 <flow-definition plugin="workflow-job@2.24">
-  <actions/>
   <description></description>
-  <displayName>Base Solr Container Build - Hybris</displayName>
+  <displayName>Base GoLang Container Build</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
     <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
@@ -18,7 +17,7 @@
       <configVersion>2</configVersion>
       <userRemoteConfigs>
         <hudson.plugins.git.UserRemoteConfig>
-          <url>https://bitbucket.org/trekbikes/con_base_solr.git</url>
+          <url>https://bitbucket.org/trekbikes/con_base_golang.git</url>
           <credentialsId>TrekDevOps</credentialsId>
         </hudson.plugins.git.UserRemoteConfig>
       </userRemoteConfigs>
