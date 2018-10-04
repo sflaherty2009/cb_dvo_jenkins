@@ -33,6 +33,30 @@ Documentation and examples are provided inline using YARD. The tests and fixture
 
 ## Recipes
 
+### _ad_auth.rb 
+
+Recipe used to configure Active Directory/LDAP authentication through Groovy scripting. PLEASE NOTE: node.run_state[:jenkins_private_key] is set within this recipe to allow access to the Chef Agent after authentication has been put in place. 
+
+### _credentials.rb
+
+Service accounts used by Jenkins jobs. Passwords are currently kept in a encrypted data bag.
+
+### _jenkins_jobs.rb
+
+Creates jenkins jobs using .xml files found in /files/default. These files can be created by going to the Jenkins job, on the given jenkins server, and appending the URL with /config.xml. From there the xml file can be saved and added to the Jenkins cookbook. The xml file will need to be added to the files/default location and called in the jobs array found within this recipe. Jobs will be named based on the name of the xml file/name located in the array.
+
+### _vm_agent.rb
+
+Using groovy scripting configures the azure-vm-agents plugin to spin up Jenkins agents on need. Agents will spin down after an hour of non use. 
+
+### default.rb
+
+Calls on jenkins server recipe.
+
+### server.rb 
+
+Installs base Jenkins installation on server. Installs all plugins required for trek Jenkins Jobs. Calls on _ad_auth recipe to setup active directory authentication. Hardens Jenkins protocols and services as outlined in jenkins online documentation. Creates jenkins jobs via the _jenkins_jobs recipe. Sets up service accounts through the _credentials recipe. 
+
 ### master
 
 The master recipe will create the required directory structure and install jenkins. There are two installation methods, controlled by the `node['jenkins']['master']['install_method']` attribute:
