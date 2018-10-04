@@ -1,18 +1,6 @@
 # cb_dvo_jenkins
 
-## TO DO 
-- add parameter plugin
-- add chefdk installation
-- add awscli
-- add chef.pem file
-- add yum install of jq
-- figure out better way to do user additions
-
-## KNOWN ISSUES 
-- When adding AD authentication method to Jenkins box you loose the ability to use local accounts. This breaks chef's ability to log back into box. AD authentication plugin cannot add permissions to jenkins box for AD users.In order to use this plugin manual steps would need to be taken.
-
-
-Installs and configures Jenkins CI master & node slaves. Resource providers to support automation via jenkins-cli, including job create/update.
+Installs and configures Jenkins CI master & node slaves, via Azure Plugin. Creates Jenkins Jobs via .xml files and _jenkins_jobs recipe. Resource providers to support automation via jenkins-cli, including job create/update.
 
 ## Requirements
 
