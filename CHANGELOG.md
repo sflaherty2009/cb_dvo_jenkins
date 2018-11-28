@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+## [0.2.26] - 2018-11-28
+
+### Modified
+
+- Updated trilead-api plugin to v1.0.1.
+
 ## [0.2.25] - 2018-11-28
 
 ### Modified
