@@ -6,6 +6,13 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+## [0.2.25] - 2018-11-28
+
+### Modified
+
+- Stripped the string 'arm' out of penv in the dvo_docker.xml file.
+- Added trilead-api v1.0.0 plugin.
+
 ## [0.2.19] - 2018-11-5
 
 ### Modified

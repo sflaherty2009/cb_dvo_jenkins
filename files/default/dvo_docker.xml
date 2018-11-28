@@ -50,7 +50,7 @@
             // pull base hybris image and try to build and push hybris container with TBC code.
             docker.withRegistry(&apos;https://conhybris.azurecr.io&apos;, &apos;conHybris&apos;){
                 sh &quot;docker login conbase.azurecr.io -u conBase -p NrD6bvZ4w7Xjk0TA6KYkfT5se/kiQErD&quot;
-                def appdev = docker.build(&quot;conhybris.azurecr.io/hybris-${environment}&quot;, &quot;--no-cache --build-arg TBC_VERSION=${version} --build-arg PENV=${environment} --build-arg IMAGE_NAME=conbase.azurecr.io/hybris:${base_version} .&quot;)
+                def appdev = docker.build(&quot;conhybris.azurecr.io/hybris-${environment}&quot;, &quot;--no-cache --build-arg TBC_VERSION=${version} --build-arg PENV=${environment.replace('arm', '')} --build-arg IMAGE_NAME=conbase.azurecr.io/hybris:${base_version} .&quot;)
                 tag = VersionNumber (versionNumberString: &apos;${BUILD_DATE_FORMATTED, &quot;yyyyMMdd&quot;}.${BUILDS_TODAY}.${BUILD_NUMBER}&apos;)
                 appdev.push(&quot;${tag}&quot;)
                 appdev.push(&apos;latest&apos;)

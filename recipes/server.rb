@@ -108,6 +108,7 @@ plugins = {
   'slack' => '2.3',
   'structs' => '1.17',
   'ssh-credentials' => '1.14',
+  'trilead-api' => '1.0.0',
   'ssh-slaves' => '1.29.1',
   'scm-api' => '2.3.0',
   'script-security' => '1.48',
