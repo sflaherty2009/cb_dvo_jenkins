@@ -32,6 +32,7 @@ include_recipe 'cb_dvo_jenkins::_ad_auth'
 plugins = {
   'maven-plugin' => '3.1.2',
   'azure-commons' => '0.2.8',
+  'active-directory' => '2.10',
   'ace-editor' => '1.1',
   'ant' => '1.9',
   'authentication-tokens' => '1.3',
