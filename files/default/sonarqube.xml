@@ -1,96 +1,50 @@
 <?xml version='1.1' encoding='UTF-8'?>
-<flow-definition plugin="workflow-job@2.24">
-  <actions>
-    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@1.3.1"/>
-    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@1.3.1">
-      <jobProperties/>
-      <triggers>
-        <string>bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.BitbucketBuildTrigger</string>
-      </triggers>
-      <parameters/>
-    </org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
-  </actions>
+<project>
+  <actions/>
   <description></description>
-  <displayName>SonarQube TBC Develop Branch</displayName>
   <keepDependencies>false</keepDependencies>
-  <properties>
-    <org.jenkinsci.plugins.workflow.job.properties.DisableConcurrentBuildsJobProperty/>
-    <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
-      <triggers>
-        <bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.BitbucketBuildTrigger plugin="bitbucket-pullrequest-builder@1.4.26">
-          <spec>* * * * * </spec>
-          <cron>* * * * * </cron>
-          <credentialsId>TrekDevOps</credentialsId>
-          <username></username>
-          <password></password>
-          <repositoryOwner>trekbikes</repositoryOwner>
-          <repositoryName>tbc</repositoryName>
-          <branchesFilter></branchesFilter>
-          <branchesFilterBySCMIncludes>false</branchesFilterBySCMIncludes>
-          <ciKey>TrekDevOps</ciKey>
-          <ciName>TrekDevOps</ciName>
-          <ciSkipPhrases></ciSkipPhrases>
-          <checkDestinationCommit>false</checkDestinationCommit>
-          <approveIfSuccess>false</approveIfSuccess>
-          <cancelOutdatedJobs>true</cancelOutdatedJobs>
-          <commentTrigger></commentTrigger>
-        </bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.BitbucketBuildTrigger>
-      </triggers>
-    </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
-  </properties>
-  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.54">
-    <script>pipeline {
-    agent any
-    triggers{
-        bitbucketpr(projectPath:&apos;git@bitbucket.org:/trekbikes/tbc.git&apos;,
-        cron:&apos;* * * * * &apos;,
-        credentialsId:&apos;TrekDevOps&apos;,
-        username:&apos;&apos;,
-        password:&apos;&apos;,
-        repositoryOwner:&apos;trekbikes&apos;,
-        repositoryName:&apos;tbc&apos;,
-        branchesFilter:&apos;&apos;,
-        branchesFilterBySCMIncludes:false,
-        ciKey:&apos;TrekDevOps&apos;,
-        ciName:&apos;TrekDevOps&apos;,
-        ciSkipPhrases:&apos;&apos;,
-        checkDestinationCommit:false,
-        approveIfSuccess:false,
-        cancelOutdatedJobs:true,
-        commentTrigger:&apos;&apos;)
-    }
-    stages{
-        stage(&apos;SonarQube Analysis&apos;){
-            steps{
-                slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;#439FE0&apos;, message: &quot;Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER} : SonarQube Analysis has started on ${sourceBranch}&quot;, teamDomain: &apos;trekbikes&apos;, token: &apos;8MNXdk9zUfLNdu20rdCJ42xP&apos;
-                sh &apos;&apos;&apos;
-                    curl -d &quot;--gitbranch=${sourceBranch}&quot; \
-                    -d &quot;-Dsonar.login=70687a9aabff12607a08dcb353ac2fd0249fe93a&quot; \
-                    -d &quot;-Dsonar.bitbucket.repoSlug=tbc&quot; \
-                    -d &quot;-Dsonar.bitbucket.accountName=trekbikes&quot; \
-                    -d &quot;-Dsonar.bitbucket.oauthClientKey=pAJJQT22jU78Ajy4y7&quot; \
-                    -d &quot;-Dsonar.bitbucket.oauthClientSecret=9ahR83WKDVTPkLhVnYNWWzpZFzVTtVUW&quot; \
-                    -d &quot;-Dsonar.bitbucket.branchName=${sourceBranch}&quot; \
-                    -d &quot;-Dsonar.analysis.mode=issues&quot; \
-                    -X POST https://sonar.trekbikes.com:8081/sonar-scanner
-                &apos;&apos;&apos;
-            }
-            post { 
-                success { 
-                    echo &apos;success&apos;
-                    slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;good&apos;, message: &quot;Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER} : SonarQube Analysis was successful on ${sourceBranch}&quot;, teamDomain: &apos;trekbikes&apos;, token: &apos;8MNXdk9zUfLNdu20rdCJ42xP&apos;
-                }
-                failure { 
-                    echo &apos;failure&apos;
-                    slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;danger&apos;, message: &quot;Job: ${env.JOB_NAME} - ${env.BUILD_NUMBER} : SonarQube Analysis has failed on ${sourceBranch}&quot;, teamDomain: &apos;trekbikes&apos;, token: &apos;8MNXdk9zUfLNdu20rdCJ42xP&apos;
-                }
-            }
-        }
-    }
-}
-</script>
-    <sandbox>false</sandbox>
-  </definition>
-  <triggers/>
-  <disabled>true</disabled>
-</flow-definition>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers>
+    <bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.BitbucketBuildTrigger plugin="bitbucket-pullrequest-builder@1.4.28">
+      <spec>* * * * * </spec>
+      <cron>* * * * * </cron>
+      <credentialsId>d6650658-2947-4b01-bd54-5ca6ff086074</credentialsId>
+      <username></username>
+      <password></password>
+      <repositoryOwner>trekbikes</repositoryOwner>
+      <repositoryName>tbc</repositoryName>
+      <branchesFilter></branchesFilter>
+      <branchesFilterBySCMIncludes>false</branchesFilterBySCMIncludes>
+      <ciKey>TrekDevOps</ciKey>
+      <ciName>TrekDevOps</ciName>
+      <ciSkipPhrases></ciSkipPhrases>
+      <checkDestinationCommit>false</checkDestinationCommit>
+      <approveIfSuccess>false</approveIfSuccess>
+      <cancelOutdatedJobs>false</cancelOutdatedJobs>
+      <commentTrigger></commentTrigger>
+    </bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.BitbucketBuildTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>curl -d &quot;--gitbranch=${sourceBranch}&quot; \
+-d &quot;-Dsonar.login=70687a9aabff12607a08dcb353ac2fd0249fe93a&quot; \
+-d &quot;-Dsonar.bitbucket.repoSlug=tbc&quot; \
+-d &quot;-Dsonar.bitbucket.accountName=trekbikes&quot; \
+-d &quot;-Dsonar.bitbucket.oauthClientKey=pAJJQT22jU78Ajy4y7&quot; \
+-d &quot;-Dsonar.bitbucket.oauthClientSecret=9ahR83WKDVTPkLhVnYNWWzpZFzVTtVUW&quot; \
+-d &quot;-Dsonar.bitbucket.branchName=${sourceBranch}&quot; \
+-d &quot;-Dsonar.analysis.mode=issues&quot; \
+-X POST https://sonar.trekbikes.com:8081/sonar-scanner
+     
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

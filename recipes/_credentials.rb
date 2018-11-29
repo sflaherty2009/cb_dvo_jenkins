@@ -35,3 +35,15 @@ jenkins_password_credentials 'conApacheMaintenance' do
   description 'creds for use by base container storage'
   password    azure_auth['service_accounts']['conApacheMaintenance']
 end
+
+jenkins_password_credentials 'grant_pierce' do
+  id          'grant_pierce'
+  description 'grant_pierce app password for pull request analyzer'
+  password    azure_auth['service_accounts']['grant_pierce']
+end
+
+jenkins_password_credentials 'scott_flaherty' do
+  id          'scott_flaherty'
+  description 'scott_flaherty app password for tbc multibranch job'
+  password    azure_auth['service_accounts']['scott_flaherty']
+end
