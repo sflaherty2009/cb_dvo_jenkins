@@ -19,9 +19,6 @@ include_recipe 'jenkins::master'
 # Install git on machine for use with bitbucket pulls
 yum_package %w(git sshpass)
 
-# pull in credentials for use with azure credentialing.
-azure_auth = data_bag_item('jenkins', 'credentials')
-
 ## ACCOUNTS/SECURITY -------------------------------------------------
 # ad_auth recipe needs to go first in order to appropriately set the Jenkins permissions for rest of the runs.
 include_recipe 'cb_dvo_jenkins::_ad_auth'
@@ -95,6 +92,7 @@ plugins = {
   'junit' => '1.26.1',
   'jquery-detached' => '1.2.1',
   'jenkins-design-language' => '1.9.0',
+  'jdk-tool' => '1.1',
   'linenumbers' => '1.2',
   'pipeline-model-definition' => '1.3.3',
   'pipeline-model-extensions' => '1.3.3',
@@ -182,73 +180,12 @@ jenkins_script 'jenkins protocol hardening' do
   action :execute
 end
 
-group 'docker' do
-  action :modify
-  members 'jenkins'
-  append true
-  notifies :restart, 'service[docker]', :immediately
-end
-
-service 'docker' do
-  action :nothing
-end
-
 directory '/standard/build' do
   recursive true
   owner 'jenkins'
   group 'jenkins'
   mode '0765'
   action :create
-end
-
-# CONFIGURE FOR KNIFE COMMANDS
-# create file for holding knife
-directory '/var/lib/jenkins/.chef' do
-  recursive true
-  owner 'jenkins'
-  group 'jenkins'
-  mode '0765'
-  action :create
-end
-
-# Set the knife.rb file for use with chef commands.
-template '/var/lib/jenkins/.chef/knife.rb' do
-  source 'knife.rb.erb'
-  owner 'jenkins'
-  group 'jenkins'
-  mode '0744'
-end
-
-# CONFIGURE FOR ATTACHMENT TO AZURE
-# create file for holding azure credentials
-directory '/var/lib/jenkins/.azure' do
-  recursive true
-  owner 'jenkins'
-  group 'jenkins'
-  mode '0765'
-  action :create
-end
-
-# file '/var/run/docker.sock' do
-#   mode '0777'
-#   action :create
-# end
-
-template '/var/lib/jenkins/.azure/credentials' do
-  source 'credentials.erb'
-  owner 'jenkins'
-  group 'jenkins'
-  variables(
-    prod_sub: azure_auth['production']['subscription'],
-    prod_client_id: azure_auth['production']['client_id'],
-    prod_client_secret: azure_auth['production']['client_secret'],
-    prod_tenant_id: azure_auth['production']['tenant_id'],
-    non_prod_sub: azure_auth['non_prod']['subscription'],
-    non_prod_client_id: azure_auth['non_prod']['client_id'],
-    non_prod_client_secret: azure_auth['non_prod']['client_secret'],
-    non_prod_tenant_id: azure_auth['non_prod']['tenant_id']
-  )
-  mode '0644'
 end
 
 # ADD SERVICE ACCOUNTS

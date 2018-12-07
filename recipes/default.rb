@@ -6,4 +6,3 @@
 
 # Call the default server installation.
 include_recipe 'cb_dvo_jenkins::server'
-include_recipe 'poise-python'
