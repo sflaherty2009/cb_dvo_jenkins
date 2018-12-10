@@ -6,6 +6,18 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+## [0.2.30] - 2018-12-5
+
+### Modified
+
+- Set e2e to build off of nonexistent 'e2e' branch.
+
+## [0.2.29] - 2018-11-30
+
+### Modified
+
+- Updated tbc_e2e job to pull from the develop branch.
+
 ## [0.2.26] - 2018-11-28
 
 ### Modified
