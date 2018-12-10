@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ## [0.2.30] - 2018-12-5
 
+- Changed jenkins agent to advanced image. Pulled VNET and Subnet setting into jenkins agent to hopefully mitigate slowdowns with Junit testing.
+
 ### Modified
 
 - Set e2e to build off of nonexistent 'e2e' branch.

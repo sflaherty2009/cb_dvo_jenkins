@@ -60,45 +60,6 @@ jenkins_script 'az_creds' do
   action :nothing
 end
 
-# Run groovy script to setup vm_agent configuration of jenkins slaves.
-# jenkins_script 'vm_agent_linux' do
-#   command <<-GROOVY.gsub(/^ {4}/, '')
-#   import com.microsoft.azure.vmagent.builders.*
-#   import com.cloudbees.plugins.credentials.*
-#   import com.cloudbees.plugins.credentials.common.*
-#   import com.cloudbees.plugins.credentials.domains.*
-#   import com.cloudbees.plugins.credentials.impl.*
-#   import jenkins.model.*
-#   import hudson.security.*
-#   import hudson.plugins.active_directory.*
-#   import org.jenkinsci.plugins.*
-#   import com.microsoft.azure.util.AzureCredentials
-
-#   def myCloud = new AzureVMCloudBuilder()
-#       .withCloudName("myAzure")
-#       .withAzureCredentialsId("azureCreds")
-#       .withNewResourceGroupName("azlJenkinsAgent")
-#       .addNewTemplate()
-#           .withName("azljenkinsagent")
-#           .withLabels("azljenkinsagent")
-#           .withLocation("East US")
-#           .withVirtualMachineSize("Standard_DS2_v2")
-#           .withNewStorageAccount("")
-#           .addNewBuiltInImage()
-#               .withBuiltInImageName("Ubuntu 16.04 LTS")
-#               .withInstallGit(true)
-#               .withInstallMaven(false)
-#               .withInstallDocker(true)
-#           .endBuiltInImage()
-#           .withAdminCredential("jenkinsAdmin")
-#       .endTemplate()
-#       .build();
-
-#     Jenkins.getInstance().clouds.add(myCloud);
-#     GROOVY
-#   action :nothing
-# end
-
 jenkins_script 'vm_agent_linux' do
   command <<-GROOVY.gsub(/^ {4}/, '')
   import com.microsoft.azure.vmagent.builders.*
