@@ -33,7 +33,7 @@ platforms:
         - lun: 0
           disk_size_gb: 979
       vnet_id: /subscriptions/9db13c96-62ad-4945-9579-74aeed296e48/resourceGroups/AZ-RG-Network/providers/Microsoft.Network/virtualNetworks/AZ-VN-EastUS2-01
-      subnet_id: AZ-SN-back
+      subnet_id: AZ-SN-dvo
       vm_name: kit-tst-jnks-01
   
 suites:
@@ -41,8 +41,6 @@ suites:
     data_bags_path: "test/integration/data_bags" 
     encrypted_data_bag_secret_key_path: "test/smoke/default/jenkins_secret"
     run_list:
-      - recipe[cb_dvo_addStorage::default]
-      - recipe[cb_dvo_docker::default]
       - recipe[cb_dvo_jenkins::default]
     attributes:
       chef_client:
