@@ -13,7 +13,7 @@
     <bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.BitbucketBuildTrigger plugin="bitbucket-pullrequest-builder@1.4.28">
       <spec>* * * * * </spec>
       <cron>* * * * * </cron>
-      <credentialsId>d6650658-2947-4b01-bd54-5ca6ff086074</credentialsId>
+      <credentialsId>grant_pierce</credentialsId>
       <username></username>
       <password></password>
       <repositoryOwner>trekbikes</repositoryOwner>
