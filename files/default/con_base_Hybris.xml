@@ -2,7 +2,7 @@
 <flow-definition plugin="workflow-job@2.24">
   <actions/>
   <description></description>
-  <displayName>Hybris Base Container Build</displayName>
+  <displayName>Base Hybris Container Build</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
     <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
