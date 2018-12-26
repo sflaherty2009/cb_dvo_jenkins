@@ -40,7 +40,7 @@
 -d &quot;-Dsonar.bitbucket.oauthClientSecret=9ahR83WKDVTPkLhVnYNWWzpZFzVTtVUW&quot; \
 -d &quot;-Dsonar.bitbucket.branchName=${sourceBranch}&quot; \
 -d &quot;-Dsonar.analysis.mode=issues&quot; \
--X POST https://10.16.128.70:8081/sonar-scanner
+-X POST http://10.16.128.70:8081/sonar-scanner
      
 </command>
     </hudson.tasks.Shell>
