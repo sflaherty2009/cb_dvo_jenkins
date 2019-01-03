@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+## [0.2.40] - 2019-01-03
+
+### Modified
+
+- Added test2 option to manual build job.
+
 ## [0.2.30] - 2018-12-5
 
 - Changed jenkins agent to advanced image. Pulled VNET and Subnet setting into jenkins agent to hopefully mitigate slowdowns with Junit testing.
