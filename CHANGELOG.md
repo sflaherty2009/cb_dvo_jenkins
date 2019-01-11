@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+## [0.2.44] - 2019-01-11
+
+### Modified
+
+- Removing Dev Hybris container build job. Should now be done in the tbc multibranch pipeline. 
+
 ## [0.2.43] - 2019-01-11
 
 ### Added
