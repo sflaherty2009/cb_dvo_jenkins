@@ -4,7 +4,27 @@
     "name": "build_cookbook",
     "path": ".delivery/build_cookbook"
   },
-  "skip_phases": [],
-  "build_nodes": {},
+  "delivery-truck": {
+    "lint": {
+      "enable_cookstyle": true,
+      "foodcritic": {
+        "ignore_rules": ["FC048","FC069","FC078"],
+        "only_rules": [],
+        "excludes": [], 
+        "fail_tags": ["any"]
+      }
+    },
+    "publish": {
+      "chef_server": true
+    }
+  },
+  "skip_phases": [
+    "unit",
+    "quality",
+    "security"
+  ],
+  "job_dispatch": {
+    "version": "v2"
+  },
   "dependencies": []
 }
