@@ -1,0 +1,85 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers>
+    <hudson.triggers.TimerTrigger>
+      <spec>H/45 * * * *</spec>
+    </hudson.triggers.TimerTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.plugins.groovy.SystemGroovy plugin="groovy@2.0">
+      <source class="hudson.plugins.groovy.StringSystemScriptSource">
+        <script plugin="script-security@1.48">
+          <script>// Check if a slave has &lt; 10 GB of free space, wipe out workspaces if it does
+
+import hudson.model.*;
+import hudson.util.*;
+import jenkins.model.*;
+import hudson.FilePath.FileCallable;
+import hudson.slaves.OfflineCause;
+import hudson.node_monitors.*;
+
+for (node in Jenkins.instance.nodes) {
+    computer = node.toComputer()
+    if (computer.getChannel() == null) continue
+
+    rootPath = node.getRootPath()
+    size = DiskSpaceMonitor.DESCRIPTOR.get(computer).size
+    roundedSize = size / (1024 * 1024 * 1024) as int
+
+    println(&quot;node: &quot; + node.getDisplayName() + &quot;, free space: &quot; + roundedSize + &quot;GB&quot;)
+    if (roundedSize &lt; 10) {
+        computer.setTemporarilyOffline(true, new hudson.slaves.OfflineCause.ByCLI(&quot;disk cleanup&quot;))
+        for (item in Jenkins.instance.items) {
+            jobName = item.getFullDisplayName()
+
+            if (item.isBuilding()) {
+                println(&quot;.. job &quot; + jobName + &quot; is currently running, skipped&quot;)
+                continue
+            }
+
+            println(&quot;.. wiping out workspaces of job &quot; + jobName)
+
+            workspacePath = node.getWorkspaceFor(item)
+            if (workspacePath == null) {
+                println(&quot;.... could not get workspace path&quot;)
+                continue
+            }
+
+            println(&quot;.... workspace = &quot; + workspacePath)
+
+            customWorkspace = item.getCustomWorkspace()
+            if (customWorkspace != null) {
+                workspacePath = node.getRootPath().child(customWorkspace)
+                println(&quot;.... custom workspace = &quot; + workspacePath)
+            }
+
+            pathAsString = workspacePath.getRemote()
+            if (workspacePath.exists()) {
+                workspacePath.deleteRecursive()
+                println(&quot;.... deleted from location &quot; + pathAsString)
+            } else {
+                println(&quot;.... nothing to delete at &quot; + pathAsString)
+            }
+        }
+
+        computer.setTemporarilyOffline(false, null)
+    }
+}</script>
+          <sandbox>false</sandbox>
+        </script>
+      </source>
+    </hudson.plugins.groovy.SystemGroovy>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>
