@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+## [0.2.41] - 2019-01-11
+
+### Modified
+
+- Added groovy plugin to Jenkins server for use with Jenkins slave cleanup scripts
+
 ## [0.2.40] - 2019-01-03
 
 ### Modified

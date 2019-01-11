@@ -83,6 +83,7 @@ plugins = {
   'github-branch-source' => '2.4.1',
   'github-api' => '1.95',
   'git-server' => '1.7',
+  'grooby' => '2.0',
   'handy-uri-templates-2-api' => '2.1.6-1.0',
   'htmlpublisher' => '1.17',
   'javadoc' => '1.4',
