@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+## [0.2.42] - 2019-01-11
+
+### Modified
+
+- Mispelling of groovy plugin was causing failure in Chef Run. 
+
 ## [0.2.41] - 2019-01-11
 
 ### Modified
