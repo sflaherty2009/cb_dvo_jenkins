@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+## [0.2.43] - 2019-01-11
+
+### Added
+
+- Added aditional Jenkins job Jenkins_Agent_Cleanup. This job will be used for cleanup of Jenkins Agents once their disks get under 10 GB free space. This job will check agent nodes every 45 minutes.
+
 ## [0.2.42] - 2019-01-11
 
 ### Modified
