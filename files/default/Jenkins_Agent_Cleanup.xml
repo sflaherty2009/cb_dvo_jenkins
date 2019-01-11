@@ -28,6 +28,45 @@ import hudson.FilePath.FileCallable;
 import hudson.slaves.OfflineCause;
 import hudson.node_monitors.*;
 
+
+def performCleanup(def node, def items) {
+  
+  for (item in items) {
+    jobName = item.getFullDisplayName()
+    
+    println(&quot;Cleaning &quot; + jobName)
+    
+    if(item instanceof com.cloudbees.hudson.plugins.folder.AbstractFolder) {
+      	performCleanup(node, item.items)
+    	continue
+    }
+    
+    if (item.isBuilding()) {
+      println(&quot;.. job &quot; + jobName + &quot; is currently running, skipped&quot;)
+      continue
+    }
+    
+    println(&quot;.. wiping out workspaces of job &quot; + jobName)
+    
+    workspacePath = node.getWorkspaceFor(item)
+    if (workspacePath == null) {
+      println(&quot;.... could not get workspace path&quot;)
+      continue
+    }
+    
+    println(&quot;.... workspace = &quot; + workspacePath)
+    
+    pathAsString = workspacePath.getRemote()
+    if (workspacePath.exists()) {
+      workspacePath.deleteRecursive()
+      println(&quot;.... deleted from location &quot; + pathAsString)
+    } else {
+      println(&quot;.... nothing to delete at &quot; + pathAsString)
+    }
+  }  
+}
+
+
 for (node in Jenkins.instance.nodes) {
     computer = node.toComputer()
     if (computer.getChannel() == null) continue
@@ -37,43 +76,12 @@ for (node in Jenkins.instance.nodes) {
     roundedSize = size / (1024 * 1024 * 1024) as int
 
     println(&quot;node: &quot; + node.getDisplayName() + &quot;, free space: &quot; + roundedSize + &quot;GB&quot;)
-    if (roundedSize &lt; 10) {
-        computer.setTemporarilyOffline(true, new hudson.slaves.OfflineCause.ByCLI(&quot;disk cleanup&quot;))
-        for (item in Jenkins.instance.items) {
-            jobName = item.getFullDisplayName()
+    computer.setTemporarilyOffline(true, new hudson.slaves.OfflineCause.ByCLI(&quot;disk cleanup&quot;))
+  
+    performCleanup(node, Jenkins.instance.items)
+  
+    computer.setTemporarilyOffline(false, null)
 
-            if (item.isBuilding()) {
-                println(&quot;.. job &quot; + jobName + &quot; is currently running, skipped&quot;)
-                continue
-            }
-
-            println(&quot;.. wiping out workspaces of job &quot; + jobName)
-
-            workspacePath = node.getWorkspaceFor(item)
-            if (workspacePath == null) {
-                println(&quot;.... could not get workspace path&quot;)
-                continue
-            }
-
-            println(&quot;.... workspace = &quot; + workspacePath)
-
-            customWorkspace = item.getCustomWorkspace()
-            if (customWorkspace != null) {
-                workspacePath = node.getRootPath().child(customWorkspace)
-                println(&quot;.... custom workspace = &quot; + workspacePath)
-            }
-
-            pathAsString = workspacePath.getRemote()
-            if (workspacePath.exists()) {
-                workspacePath.deleteRecursive()
-                println(&quot;.... deleted from location &quot; + pathAsString)
-            } else {
-                println(&quot;.... nothing to delete at &quot; + pathAsString)
-            }
-        }
-
-        computer.setTemporarilyOffline(false, null)
-    }
 }</script>
           <sandbox>false</sandbox>
         </script>
