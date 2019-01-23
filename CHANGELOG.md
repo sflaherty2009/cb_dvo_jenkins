@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+## [0.2.46] - 2019-01-23
+
+### Added
+
+- Refresh job option for tst2.
+
 ## [0.2.44] - 2019-01-11
 
 ### Modified

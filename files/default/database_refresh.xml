@@ -26,6 +26,7 @@
               <string>mdn</string>
               <string>tf</string>
               <string>tst</string>
+              <string>tst2</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
