@@ -4,7 +4,7 @@ maintainer_email 'devops@trekbikes.com'
 license 'all_rights'
 description 'Installs/Configures jenkins resources with a focus on DVO Chef Pipeline needs.'
 long_description 'See README.md'
-version '0.2.47'
+version '0.2.48'
 chef_version '>= 12.1' if respond_to?(:chef_version)
 supports 'centos'
 
@@ -18,5 +18,4 @@ depends 'firewall', '~> 2.6.2'
 depends 'poise-python', '~> 1.6.0'
 depends 'chef-dk', '~> 3.1.0'
 depends 'azurecli', '~> 0.1.2'
-depends 'cb_dvo_docker'
-depends 'cb_dvo_addstorage'
+
