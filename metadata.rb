@@ -18,4 +18,3 @@ depends 'firewall', '~> 2.6.2'
 depends 'poise-python', '~> 1.6.0'
 depends 'chef-dk', '~> 3.1.0'
 depends 'azurecli', '~> 0.1.2'
-
