@@ -9,13 +9,3 @@ default['jenkins']['master']['port'] = '8080'
 default['jenkins']['master']['endpoint'] = "http://#{node['jenkins']['master']['host']}:#{node['jenkins']['master']['port']}"
 # update timeout to 480 seconds
 default['jenkins']['executor']['timeout'] = 480
-
-# information for azure credentials. Implements num values unless databag is available.
-default['azure_auth']['production']['subscription'] = nil
-default['azure_auth']['production']['client_id'] = nil
-default['azure_auth']['production']['client_secret'] = nil
-default['azure_auth']['production']['tenant_id'] = nil
-default['azure_auth']['non_prod']['subscription'] = nil
-default['azure_auth']['non_prod']['client_id'] = nil
-default['azure_auth']['non_prod']['client_secret'] = nil
-default['azure_auth']['non_prod']['tenant_id'] = nil
