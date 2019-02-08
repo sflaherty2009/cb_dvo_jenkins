@@ -11,6 +11,6 @@ supports 'centos'
 source_url 'https://bitbucket.org/trekbikes/cb_dvo_jenkins'
 issues_url 'https://bitbucket.org/trekbikes/cb_dvo_jeknins/issues?status=new&status=open'
 
-depends 'apt', '~> 7.1.1'
+depends 'apt', '~> 6.1.4'
 depends 'jenkins', '~> 6.2.1'
 depends 'java', '~> 3.2.0'
