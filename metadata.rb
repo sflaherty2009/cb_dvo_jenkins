@@ -13,4 +13,4 @@ issues_url 'https://bitbucket.org/trekbikes/cb_dvo_jeknins/issues?status=new&sta
 
 depends 'apt', '~> 6.1.4'
 depends 'jenkins', '~> 6.2.1'
-depends 'java', '~> 3.2.0'
+depends 'java', '~> 1.50.0'
