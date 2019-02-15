@@ -102,8 +102,8 @@ jenkins_script 'vm_agent_linux' do
                 sudo gpasswd -a jenkins docker
                 sudo chmod 0777 /var/run/docker.sock
                 sudo apt-get install -y git
-                wget "https://aztrksaslh00archive01.blob.core.windows.net/jenkins/dvo_jenkins.pem?sp=r&st=2019-02-13T17:12:14Z&se=2029-02-14T01:12:14Z&spr=https&sv=2018-03-28&sig=qrn0nLJxpx2aANoDH0Aa5zM1OF6p9ZiCWOnrzQocYZE%3D&sr=b" -O /home/jenkinsAdmin/dvo_jenkins.pem
-                wget "https://aztrksaslh00archive01.blob.core.windows.net/jenkins/jenkins.rb?sp=r&st=2019-02-13T17:14:53Z&se=2029-02-14T01:14:53Z&spr=https&sv=2018-03-28&sig=fdTOpBd%2B3yODmUeayfDNCAYM%2BuZ0ZlzGQxzXSXX6TU0%3D&sr=b" -O /home/jenkinsAdmin/jenkins.rb
+                wget "https://aztrksaslh00archive01.blob.core.windows.net/jenkins/dvo_jenkins.pem?sp=r&st=2019-02-13T17:12:14Z&se=2029-02-14T01:12:14Z&spr=https&sv=2018-03-28&sig=#{azure_auth['service_accounts']['sas_key_pem']}" -O /home/jenkinsAdmin/dvo_jenkins.pem
+                wget "https://aztrksaslh00archive01.blob.core.windows.net/jenkins/jenkins.rb?sp=r&st=2019-02-13T17:14:53Z&se=2029-02-14T01:14:53Z&spr=https&sv=2018-03-28&sig=#{azure_auth['service_accounts']['sas_key_rb']}" -O /home/jenkinsAdmin/jenkins.rb
               /$)
           .endAdvancedImage()
           .withAdminCredential("jenkinsAdmin")
