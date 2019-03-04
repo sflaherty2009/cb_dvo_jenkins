@@ -1,0 +1,103 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.29">
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>Environment</name>
+          <description>Environment to skip window in</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>dev</string>
+              <string>dev2</string>
+              <string>e2e</string>
+              <string>mdn</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>Window</name>
+          <description>Timing window to skip</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>0100 (1:00 AM CST)</string>
+              <string>0400 (4:00 AM CST)</string>
+              <string>0530 (5:30 AM CST)</string>
+              <string>1100 (11:00 AM CST)</string>
+              <string>1530 (3:30 PM CST)</string>
+              <string>2300 (11:00 PM CST)</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.60">
+    <script>import groovy.json.JsonOutput
+
+def dockerRun(command, config) {
+    sh &quot;docker run --add-host=AZL-ChefServer-01:10.16.192.4 \
+        -v /home/jenkinsAdmin:/home/root chef/chefdk knife ${command} \
+        --config ${config}&quot;
+}
+def twelvehour = (env.Window.replaceAll(&quot;.*\\(&quot;, &quot;&quot;).replaceAll(&quot;\\)&quot;,&quot;&quot;).trim())
+def twentyfourhour = (env.Window.replaceAll(&quot;\\(.*\\)&quot;, &quot;&quot;).trim())
+def slackNotificationChannel = &quot;#devops-test&quot;
+def notifySlack(text, channel, attachments) {
+    def slackURL = &apos;https://hooks.slack.com/services/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&apos;
+    def jenkinsIcon = &apos;https://wiki.jenkins-ci.org/download/attachments/2916393/logo.png&apos;
+
+    def payload = JsonOutput.toJson([text: text,
+        channel: channel,
+        username: &quot;The Deployment Skipper&quot;,
+        icon_url: jenkinsIcon,
+        attachments: attachments
+    ])
+
+    sh &quot;curl -X POST --data-urlencode \&apos;payload=${payload}\&apos; ${slackURL}&quot;
+}
+
+node {
+    stage(&apos;Update Attribute&apos;) {
+        dockerRun(&quot;exec -E \&apos;nodes.find(\&quot;name:azl-${env.Environment}-hyb*\&quot;) \
+        {|n| n.normal[\&quot;dvo_user\&quot;][\&quot;hybris\&quot;][\&quot;auto\&quot;][\&quot;$twentyfourhour\&quot;]=false; n.save}\&apos;&quot;, &quot;/home/root/jenkins.rb&quot;)
+    }
+        
+    stage(&apos;Update Crontab&apos;) {
+        withCredentials([[$class: &apos;UsernamePasswordMultiBinding&apos;, credentialsId: &apos;local_admin&apos;,
+        usernameVariable: &apos;USERNAME&apos;, passwordVariable: &apos;PASSWORD&apos;]]) {
+            dockerRun(&quot;ssh \&quot;name:azl-${env.Environment}-hyb*\&quot; \
+            \&quot;sudo chef-client -o cb_dvo_hybris::auto\&quot; -x ${env.USERNAME} -P \&apos;${env.PASSWORD}\&apos;&quot;, &quot;/home/root/jenkins.rb&quot;)
+        }
+    }
+    
+    stage(&apos;Send Slack Message&apos;) {
+        notifySlack(&quot;&quot;, slackNotificationChannel, [
+            [
+                color: &quot;good&quot;,
+                text: &quot;The following auto-deployment window will be skipped:&quot;,
+                &quot;mrkdwn_in&quot;: [&quot;fields&quot;],
+                fields: [
+                    [
+                        title: &quot;Timing Window&quot;,
+                        value: &quot;${twelvehour}&quot;,
+                        short: true
+                    ],
+                    [
+                        title: &quot;Node&quot;,
+                        value: &quot;azl-${env.Environment}-hyb-01&quot;,
+                        short: true
+                    ]
+                ]
+            ]
+        ])
+    }
+}</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>
