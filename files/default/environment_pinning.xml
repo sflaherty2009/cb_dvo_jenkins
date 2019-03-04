@@ -1,0 +1,165 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers>
+    <hudson.triggers.TimerTrigger>
+      <spec>H 13,20 * * 1-5</spec>
+    </hudson.triggers.TimerTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>#!/bin/bash
+
+bitbucket_project=&quot;CHEF&quot;
+bitbucket_search_query=&quot;project.key=\&quot;${bitbucket_project}\&quot;+AND+name!~\&quot;deprecated\&quot;+AND+name~\&quot;cb_\&quot;&quot;
+bitbucket_page_length=&quot;100&quot;
+
+confluence_page_id=&quot;532414613&quot;
+confluence_page_space=&quot;WCP&quot;
+
+timestamp=$(date +%s)
+
+tempdir=$WORKSPACE/tmp/DVO_repos_$timestamp
+
+bitbucket_repo_list=($(curl -su $bitbucket_username:$bitbucket_app_key -X GET -H &quot;Content-Type: application/json&quot;  https://api.bitbucket.org/2.0/repositories/trekbikes/\?pagelen\=$bitbucket_page_length\&amp;page\=1\&amp;q\=$bitbucket_search_query\&amp;sort\=name | \
+python -c &apos;
+import json, sys
+obj=json.load(sys.stdin)
+for y in [x[&quot;name&quot;] for x in obj[&quot;values&quot;]]:
+  print y
+&apos;))
+
+confluence_table_content=&quot;&quot;
+
+for repo in &quot;${bitbucket_repo_list[@]}&quot;
+do
+  dir=&quot;$tempdir/$repo&quot;
+  git clone https://$bitbucket_username:$bitbucket_app_key@bitbucket.org/trekbikes/$repo.git ${dir} 
+
+  if [ \( -f &quot;${dir}/metadata.rb&quot; -a -f &quot;${dir}/environments.json&quot; \) ]; then
+    metadata_name=$(awk -F\&apos; &apos;/^name/ {print $2}&apos; ${dir}/metadata.rb)
+    environment_name=$(awk -F\&quot; &apos;/\&quot;: \{/ {print $2}&apos; ${dir}/environments.json)
+
+    metadata_version=$(awk -F\&apos; &apos;/^version/ {print $2}&apos; ${dir}/metadata.rb)
+    environment_production_version=&quot;$(awk -F\&quot; &apos;/production&quot;:/ {print $4}&apos; ${dir}/environments.json)&quot;
+    environment_staging_version=$(awk -F\&quot; &apos;/staging&quot;:/ {print $4}&apos; ${dir}/environments.json)
+    environment_testing_version=$(awk -F\&quot; &apos;/testing&quot;:/ {print $4}&apos; ${dir}/environments.json)
+
+    if [ -z &quot;$metadata_name&quot; -o -z &quot;$environment_name&quot; -o &quot;$metadata_name&quot; != &quot;$environment_name&quot; ]; then
+      color=&quot;red&quot;
+      confluence_table_content+=&quot;&lt;tr&gt;&lt;td&gt;$repo&lt;/td&gt;&lt;td class=\\\&quot;highlight-$color\\\&quot; style=\\\&quot;text-align: left;\\\&quot; colspan=\\\&quot;1\\\&quot; data-highlight-colour=\\\&quot;$color\\\&quot;&gt;$metadata_version&lt;/td&gt;&lt;td class=\\\&quot;highlight-$color\\\&quot; style=\\\&quot;text-align: left;\\\&quot; colspan=\\\&quot;1\\\&quot; data-highlight-colour=\\\&quot;$color\\\&quot;&gt;X&lt;/td&gt;&lt;td class=\\\&quot;highlight-$color\\\&quot; style=\\\&quot;text-align: left;\\\&quot; colspan=\\\&quot;1\\\&quot; data-highlight-colour=\\\&quot;$color\\\&quot;&gt;X&lt;/td&gt;&lt;td class=\\\&quot;highlight-$color\\\&quot; style=\\\&quot;text-align: left;\\\&quot; colspan=\\\&quot;1\\\&quot; data-highlight-colour=\\\&quot;$color\\\&quot;&gt;X&lt;/td&gt;&lt;td colspan=\\\&quot;1\\\&quot;&gt;Environments file is busted!&lt;/td&gt;&lt;/tr&gt;&quot;
+      echo ${repo} environments file is busted;
+    else
+      confluence_table_content+=&quot;&lt;tr&gt;&lt;td&gt;$repo&lt;/td&gt;&lt;td class=\\\&quot;highlight-green\\\&quot; style=\\\&quot;text-align: left;\\\&quot; colspan=\\\&quot;1\\\&quot; data-highlight-colour=\\\&quot;green\\\&quot;&gt;$metadata_version&lt;/td&gt;&quot;
+
+      if [[ &quot;$metadata_version&quot; == &quot;$environment_testing_version&quot; ]]; then
+        color=&quot;green&quot;
+        echo ${repo}:${metadata_version} is up to date in testing;
+      elif [[ &quot;$metadata_version&quot; &gt; &quot;$environment_testing_version&quot; ]]; then
+        color=&quot;red&quot;
+        echo ${repo}:${metadata_version} is behind in testing:$environment_testing_version;
+      else
+        color=&quot;red&quot;
+        echo ${repo}:$metadata_version is ahead in testing:$environment_testing_version;
+      fi
+
+      confluence_table_content+=&quot;&lt;td class=\\\&quot;highlight-$color\\\&quot; style=\\\&quot;text-align: left;\\\&quot; colspan=\\\&quot;1\\\&quot; data-highlight-colour=\\\&quot;$color\\\&quot;&gt;$environment_staging_version&lt;/td&gt;&quot;
+
+
+      if [[ &quot;$metadata_version&quot; == &quot;$environment_staging_version&quot; ]]; then
+        color=&quot;green&quot;
+        echo ${repo}:${metadata_version} is up to date in staging;
+      elif [[ &quot;$metadata_version&quot; &gt; &quot;$environment_staging_version&quot; ]]; then
+        color=&quot;red&quot;
+        echo ${repo}:${metadata_version} is behind in staging:$environment_staging_version;
+      else
+        color=&quot;red&quot;
+        echo ${repo}:$metadata_version is ahead in staging:$environment_staging_version;
+      fi
+
+      confluence_table_content+=&quot;&lt;td class=\\\&quot;highlight-$color\\\&quot; style=\\\&quot;text-align: left;\\\&quot; colspan=\\\&quot;1\\\&quot; data-highlight-colour=\\\&quot;$color\\\&quot;&gt;$environment_staging_version&lt;/td&gt;&quot;
+
+      if [[ &quot;$metadata_version&quot; == &quot;$environment_production_version&quot; ]]; then
+        color=&quot;green&quot;
+        echo ${repo}:${metadata_version} is up to date in production;
+      elif [[ &quot;$metadata_version&quot; &gt; &quot;$environment_production_version&quot; ]]; then
+        color=&quot;red&quot;
+        echo ${repo}:${metadata_version} is behind in production:$environment_production_version;
+      else
+        color=&quot;red&quot;
+        echo ${repo}:$metadata_version is ahead in production:$environment_production_version;
+      fi
+
+      confluence_table_content+=&quot;&lt;td class=\\\&quot;highlight-$color\\\&quot; style=\\\&quot;text-align: left;\\\&quot; colspan=\\\&quot;1\\\&quot; data-highlight-colour=\\\&quot;$color\\\&quot;&gt;$environment_production_version&lt;/td&gt;&quot;
+
+      confluence_table_content+=&quot;&lt;td colspan=\\\&quot;1\\\&quot;&gt;&lt;br /&gt;&lt;/td&gt;&lt;/tr&gt;&quot;
+    fi
+  else
+    color=&quot;red&quot;
+    confluence_table_content+=&quot;&lt;tr&gt;&lt;td&gt;$repo&lt;/td&gt;&lt;td class=\\\&quot;highlight-$color\\\&quot; style=\\\&quot;text-align: left;\\\&quot; colspan=\\\&quot;1\\\&quot; data-highlight-colour=\\\&quot;$color\\\&quot;&gt;X&lt;/td&gt;&lt;td class=\\\&quot;highlight-$color\\\&quot; style=\\\&quot;text-align: left;\\\&quot; colspan=\\\&quot;1\\\&quot; data-highlight-colour=\\\&quot;$color\\\&quot;&gt;X&lt;/td&gt;&lt;td class=\\\&quot;highlight-$color\\\&quot; style=\\\&quot;text-align: left;\\\&quot; colspan=\\\&quot;1\\\&quot; data-highlight-colour=\\\&quot;$color\\\&quot;&gt;X&lt;/td&gt;&lt;td class=\\\&quot;highlight-$color\\\&quot; style=\\\&quot;text-align: left;\\\&quot; colspan=\\\&quot;1\\\&quot; data-highlight-colour=\\\&quot;$color\\\&quot;&gt;X&lt;/td&gt;&lt;td colspan=\\\&quot;1\\\&quot;&gt;Environment files missing!&lt;/td&gt;&lt;/tr&gt;&quot;
+    echo &quot;${repo} is broken.&quot;
+  fi
+done
+
+confluence_page_json=$(curl -su $confluence_username:$confluence_token https://trekbikes.atlassian.net/wiki/rest/api/content/$confluence_page_id\?status\=any\&amp;expand\=version,title,body.storage)
+
+confluence_original_page_body=$(echo $confluence_page_json |\
+python -c &apos;
+import json, sys;
+obj=json.load(sys.stdin)
+print obj[&quot;body&quot;][&quot;storage&quot;][&quot;value&quot;]
+&apos;)
+
+confluence_original_page_title=$(echo $confluence_page_json |\
+python -c &apos;
+import json, sys;
+obj=json.load(sys.stdin)
+print obj[&quot;title&quot;]
+&apos;)
+
+confluence_next_page_version=$(echo $confluence_page_json |\
+python -c &apos;
+import json, sys;
+obj=json.load(sys.stdin)
+print obj[&quot;version&quot;][&quot;number&quot;]+1
+&apos;)
+
+confluence_page_header=&quot;&lt;p class=\\\&quot;auto-cursor-target\\\&quot;&gt;This page is kept up to date automatically. Do not edit.&lt;/p&gt;&lt;p class=\\\&quot;auto-cursor-target\\\&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;table class=\\\&quot;wrapped\\\&quot;&gt;&lt;colgroup&gt;&lt;col style=\\\&quot;width: 189.0px;\\\&quot; /&gt;&lt;col style=\\\&quot;width: 72.0px;\\\&quot; /&gt;&lt;col style=\\\&quot;width: 70.0px;\\\&quot; /&gt;&lt;col style=\\\&quot;width: 73.0px;\\\&quot; /&gt;&lt;col style=\\\&quot;width: 95.0px;\\\&quot; /&gt;&lt;col /&gt;&lt;/colgroup&gt;&lt;tbody&gt;&lt;tr&gt;&lt;th&gt;Cookbook&lt;/th&gt;&lt;th colspan=\\\&quot;1\\\&quot;&gt;Current&lt;/th&gt;&lt;th colspan=\\\&quot;1\\\&quot;&gt;Testing&lt;/th&gt;&lt;th colspan=\\\&quot;1\\\&quot;&gt;Staging&lt;/th&gt;&lt;th colspan=\\\&quot;1\\\&quot;&gt;Production&lt;/th&gt;&lt;th colspan=\\\&quot;1\\\&quot;&gt;Notes&lt;/th&gt;&lt;/tr&gt;&quot;
+
+confluence_page_footer=&quot;&lt;/tbody&gt;&lt;/table&gt;&lt;p class=\\\&quot;auto-cursor-target\\\&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;table class=\\\&quot;wrapped\\\&quot;&gt;&lt;colgroup&gt;&lt;col /&gt;&lt;col /&gt;&lt;col /&gt;&lt;col /&gt;&lt;/colgroup&gt;&lt;tbody&gt;&lt;tr&gt;&lt;th&gt;Terraform Project&lt;/th&gt;&lt;th colspan=\\\&quot;1\\\&quot;&gt;Testing&lt;/th&gt;&lt;th colspan=\\\&quot;1\\\&quot;&gt;Staging&lt;/th&gt;&lt;th colspan=\\\&quot;1\\\&quot;&gt;Production&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;br /&gt;&lt;/td&gt;&lt;td colspan=\\\&quot;1\\\&quot;&gt;&lt;br /&gt;&lt;/td&gt;&lt;td colspan=\\\&quot;1\\\&quot;&gt;&lt;br /&gt;&lt;/td&gt;&lt;td colspan=\\\&quot;1\\\&quot;&gt;&lt;br /&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;p class=\\\&quot;auto-cursor-target\\\&quot;&gt;&lt;br /&gt;&lt;/p&gt;&quot;
+
+confluence_new_page_title=&quot;$confluence_original_page_title&quot;
+confluence_new_page_body=&quot;${confluence_page_header}${confluence_table_content}${confluence_page_footer}&quot;
+
+curl -su $confluence_username:$confluence_token -X PUT -H &apos;Content-Type: application/json&apos; -d &quot;{\&quot;id\&quot;:\&quot;$confluence_page_id\&quot;,\&quot;type\&quot;:\&quot;page\&quot;,\&quot;title\&quot;:\&quot;$confluence_new_page_title\&quot;,\&quot;space\&quot;:{\&quot;key\&quot;:\&quot;$confluence_page_space\&quot;},\&quot;body\&quot;:{\&quot;storage\&quot;:{\&quot;value\&quot;:\&quot;$confluence_new_page_body\&quot;,\&quot;representation\&quot;:\&quot;storage\&quot;}},\&quot;version\&quot;:{\&quot;number\&quot;:$confluence_next_page_version}}&quot; https://trekbikes.atlassian.net/wiki/rest/api/content/$confluence_page_id &amp;&gt; /dev/null
+
+rm -rf /tmp/DVO_repos_*</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <org.jenkinsci.plugins.credentialsbinding.impl.SecretBuildWrapper plugin="credentials-binding@1.17">
+      <bindings>
+        <org.jenkinsci.plugins.credentialsbinding.impl.UsernamePasswordMultiBinding>
+          <credentialsId>test</credentialsId>
+          <usernameVariable>bitbucket_username</usernameVariable>
+          <passwordVariable>bitbucket_app_key</passwordVariable>
+        </org.jenkinsci.plugins.credentialsbinding.impl.UsernamePasswordMultiBinding>
+        <org.jenkinsci.plugins.credentialsbinding.impl.UsernamePasswordMultiBinding>
+          <credentialsId>confluence</credentialsId>
+          <usernameVariable>confluence_username</usernameVariable>
+          <passwordVariable>confluence_token</passwordVariable>
+        </org.jenkinsci.plugins.credentialsbinding.impl.UsernamePasswordMultiBinding>
+      </bindings>
+    </org.jenkinsci.plugins.credentialsbinding.impl.SecretBuildWrapper>
+  </buildWrappers>
+</project>
