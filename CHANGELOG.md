@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+### Changed 
+
+## [0.25.1] - 2019-03-07 
+
+- Added init script for adding components needed for knife commands.
+- Modified vm_agent.rb so that SAS key was not sitting in plain text in vm_agent recipe.
+- Modifying LDAP server.
+- Updating traffic drain job, adding environment pinning and acr cleanup job. Adding further credentials for environment pinning job.
+- Adding in hybris auto deploy skip job.
+- Changing current acr cleanup job.
+- Updating environment pinning and metadata pinning.
+
 ## [0.2.50] - 2019-03-01
 
 ### Added
