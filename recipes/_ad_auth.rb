@@ -64,7 +64,7 @@ jenkins_script 'configure permissions' do
     def instance = Jenkins.getInstance()
     String domain = 'trek.web'
     String site = ''
-    String server = '10.14.1.4:3268'
+    String server = '10.14.1.10:3268'
     String bindName = 'domainjoiner@trek.web'
     String bindPassword = 'join1tN0w'
     adrealm = new ActiveDirectorySecurityRealm(domain, site, bindName, bindPassword, server)

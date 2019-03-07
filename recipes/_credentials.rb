@@ -47,3 +47,15 @@ jenkins_password_credentials 'scott_flaherty' do
   description 'scott_flaherty app password for tbc multibranch job'
   password    azure_auth['service_accounts']['scott_flaherty']
 end
+
+jenkins_password_credentials 'bitbucket_pinning' do
+  id          'scott_flaherty'
+  description 'scott_flaherty app password for tbc multibranch job'
+  password    azure_auth['service_accounts']['bitbucket_pinning']
+end
+
+jenkins_password_credentials 'confluence_pinning' do
+  id          'scott_flaherty@trekbikes.com'
+  description 'scott_flaherty app password for tbc multibranch job'
+  password    azure_auth['service_accounts']['confluence_pinning']
+end
