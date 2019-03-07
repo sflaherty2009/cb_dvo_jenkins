@@ -29,12 +29,16 @@
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <triggers/>
+  <triggers>
+    <hudson.triggers.TimerTrigger>
+      <spec>* * * * 6</spec>
+    </hudson.triggers.TimerTrigger>
+  </triggers>
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
       <command>docker login conbase.azurecr.io -u $CONBASE_USERNAME -p $CONBASE_PASSWORD
-docker run conbase.azurecr.io/container-cleanup:v1.0 -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID -e $Environment</command>
+docker run conbase.azurecr.io/container-cleanup:v1.2 -u $AZURE_CLIENT_ID -p $AZURE_CLIENT_SECRET -t $AZURE_TENANT_ID -e $Environment</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
