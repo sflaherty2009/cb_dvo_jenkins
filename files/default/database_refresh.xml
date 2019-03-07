@@ -20,6 +20,7 @@
             <a class="string-array">
               <string>dev</string>
               <string>dev2</string>
+              <string>dev3</string>
               <string>dmn</string>
               <string>e2e</string>
               <string>prf</string>

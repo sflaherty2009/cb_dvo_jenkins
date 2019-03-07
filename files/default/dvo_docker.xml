@@ -15,7 +15,7 @@
     stage(&apos;Pulling Commit Information&apos;){
         // Determine which environment this will be built in. 
         environment = input(
-            id: &apos;environment&apos;, message: &apos;User input required&apos;, ok: &apos;ok&apos;, parameters: [choice(name: &apos;environment&apos;, choices: &apos;dev2\ne2e\nmadone\nproofing\ndomane\ntopfuel\ntestarm\ntest2\nprodarm&apos;, description: &apos;What environment are we building for?&apos;)])
+            id: &apos;environment&apos;, message: &apos;User input required&apos;, ok: &apos;ok&apos;, parameters: [choice(name: &apos;environment&apos;, choices: &apos;dev2\ndev3\ne2e\nmadone\nproofing\ndomane\ntopfuel\ntestarm\ntest2\nprodarm&apos;, description: &apos;What environment are we building for?&apos;)])
         version = input(
             id: &apos;version&apos;, message: &apos;input the version for the environment: &apos;, ok: &apos;ok&apos;, parameters: [string(defaultValue: &apos;master&apos;, description: &apos;.....&apos;, name: &apos;environment version&apos;)])
         base_version = input(

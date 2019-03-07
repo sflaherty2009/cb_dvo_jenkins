@@ -2,9 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [0.2.50] - 2019-03-01
 
-### Changed
+### Added
+
+- Dev3 options for refresh and manual container build jobs.
 
 ## [0.2.46] - 2019-01-23
 
