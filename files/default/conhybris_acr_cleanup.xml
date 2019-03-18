@@ -2,6 +2,7 @@
 <project>
   <actions/>
   <description></description>
+  <displayName>Hybris ACR Cleanup</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
