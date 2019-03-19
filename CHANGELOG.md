@@ -2,7 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.52] - 2019-03-18 
+
 ### Changed 
+
+- Added proper display names for deploy skip, traffic drain and acr cleanup
+- Added database backup job
+- Fixed refresh job
 
 ## [0.25.1] - 2019-03-07 
 

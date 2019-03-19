@@ -2,6 +2,7 @@
 <flow-definition plugin="workflow-job@2.29">
   <actions/>
   <description></description>
+  <displayName>Web Traffic Drain</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>

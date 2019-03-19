@@ -1,0 +1,59 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.29">
+  <actions/>
+  <description></description>
+  <displayName>Hybris Database Backup</displayName>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>Version</name>
+          <description>Back-up version</description>
+          <defaultValue>5.14.0</defaultValue>
+          <trim>false</trim>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.ChoiceParameterDefinition>
+          <name>Environment</name>
+          <description>Environment to backup</description>
+          <choices class="java.util.Arrays$ArrayList">
+            <a class="string-array">
+              <string>prd</string>
+              <string>tst</string>
+              <string>dev</string>
+              <string>dev2</string>
+              <string>dev3</string>
+              <string>dmn</string>
+              <string>e2e</string>
+              <string>prf</string>
+              <string>mdn</string>
+            </a>
+          </choices>
+        </hudson.model.ChoiceParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.60">
+    <script>def dockerRun(command) {
+  def config = &apos;--config /home/root/jenkins.rb&apos;
+  sh &quot;docker run --add-host=AZL-ChefServer-01:10.16.192.4 \
+    -v /home/jenkinsAdmin:/home/root chef/chefdk ${command} \
+    ${config}&quot;
+}
+
+node {  
+  stage(&apos;Update Version Attribute&apos;) {
+    dockerRun(&quot;knife exec -E &apos;nodes.find(\&quot;name:azw-${env.Environment}-sql-01\&quot;) {|n| n.normal[\&quot;dvo_user\&quot;][\&quot;hybDatabase\&quot;][\&quot;db_version\&quot;]=\&quot;${env.Version}\&quot;; n.save}&apos;&quot;)
+  }
+      
+  stage(&apos;Kick-off DB Backup&apos;) {
+    withCredentials([usernamePassword(credentialsId: &apos;local_admin&apos;, usernameVariable: &apos;USERNAME&apos;, passwordVariable: &apos;PASSWORD&apos;)]) {
+      dockerRun(&quot;knife winrm \&quot;name:azw-${env.Environment}-sql-01\&quot; \&quot;chef-client -o cb_dvo_hybdatabase::backup\&quot; --winrm-user ${env.USERNAME} --winrm-password \&apos;${env.PASSWORD}\&apos;&quot;)
+    }
+  }
+}</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>
