@@ -1,6 +1,6 @@
-<?xml version='1.1' encoding='UTF-8'?>                                                                                                                                                                                [58/129]
-<flow-definition plugin="workflow-job@2.29">                                                                                                                                                                                  
-  <actions/>                                                                                                                                                                                                                  
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.29">
+  <actions/>
   <description></description>
   <displayName>Hybris Auto Deploy Skip</displayName>
   <keepDependencies>false</keepDependencies>
@@ -71,7 +71,7 @@ node {
       dockerRun(&quot;knife exec -E \&apos;nodes.find(\&quot;name:azl-${env.Environment}-hyb*\&quot;) \
       {|n| n.normal[\&quot;dvo_user\&quot;][\&quot;hybris\&quot;][\&quot;auto\&quot;][\&quot;$twentyfourhour\&quot;]=false; n.save}\&apos;&quot;)
     }
-          
+
     stage(&apos;Update Crontab&apos;) {
       withCredentials([[$class: &apos;UsernamePasswordMultiBinding&apos;, credentialsId: &apos;local_admin&apos;,
       usernameVariable: &apos;USERNAME&apos;, passwordVariable: &apos;PASSWORD&apos;]]) {
@@ -79,7 +79,7 @@ node {
         \&quot;sudo chef-client -o cb_dvo_hybris::auto\&quot; -x ${env.USERNAME} -P \&apos;${env.PASSWORD}\&apos;&quot;)
       }
     }
-      
+
     stage(&apos;Send Slack Message&apos;) {
       notifySlack(&quot;&quot;, slackNotificationChannel, slackUsername, [
         [
