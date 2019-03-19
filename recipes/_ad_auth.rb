@@ -10,7 +10,7 @@ require 'net/ssh'
 
 # Install active directory plugin for use with authentication.
 plugins = {
-  'active-directory' => '2.8',
+  'active-directory' => '2.12',
 }
 
 # run each plugin once with the version given to it. Do not run dependencies. Notify restart on the service only if it's the last plugin.
