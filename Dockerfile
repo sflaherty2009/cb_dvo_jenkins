@@ -19,9 +19,6 @@ RUN wget --quiet --content-disposition "http://packages.chef.io/files/${CHANNEL}
     dpkg -i /tmp/chefdk.deb && \
     chef gem install kitchen-docker && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    groupmod -g ${GROUP_ID} jenkins && \
-    usermod -u ${USER_ID} -g ${GROUP_ID} ${USER} && \
-    adduser ${USER} docker
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* 
 USER jenkins
 VOLUME /var/run/docker.sock
