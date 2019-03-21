@@ -2,6 +2,7 @@ pipeline {
   agent {
     dockerfile {
       filename 'Dockerfile'
+      args '--net host -u 0:0 -v /var/run/docker.sock:/var/run/docker.sock'
     }
 
   }
