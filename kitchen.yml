@@ -1,33 +1,21 @@
 ---
 
 driver:
-  name: azurerm
+  name: dokken
   use_sudo: false
 
 provisioner:
-  deprecations_as_errors: true
+  name: chef_zero
+  require_chef_omnibus: 13.8.5
 
 verifier:
   name: inspec
 
 # Customize the following sections for the platforms & suites specific to your cookbook! This is just an example
 platforms:
-  - name: azure
-    transport:
-      ssh_key: ~/.ssh/id_rsa
-    driver:
-      name: azurerm
-    driver_config:
-      subscription_id: '9db13c96-62ad-4945-9579-74aeed296e48'
-      location: East US 2
-      machine_size: Standard_D1
-      image_urn: OpenLogic:CentOS:7.4:latest
-      data_disks:
-        - lun: 0
-          disk_size_gb: 979
-      vnet_id: /subscriptions/9db13c96-62ad-4945-9579-74aeed296e48/resourceGroups/AZ-RG-Network/providers/Microsoft.Network/virtualNetworks/AZ-VN-EastUS2-01
-      subnet_id: AZ-SN-dvo
-      vm_name: kit-chf-jnks-01
+- name: centos-6
+  driver:
+    image: centos:6
     
 suites:
   - name: default
