@@ -2,13 +2,10 @@
 
 driver:
   name: docker
+  use_sudo: false
 
 provisioner:
-  name: chef_zero
-  client_rb:
-    environment: test-kitchen
-    node_name: "<%= ENV['USER'] %>"
-    client_key: "/tmp/kitchen/data/<%= ENV['USER'] %>.pem"
+  deprecations_as_errors: true
 
 verifier:
   name: inspec
@@ -16,46 +13,16 @@ verifier:
 # Customize the following sections for the platforms & suites specific to your cookbook! This is just an example
 
 platforms:
-- name: azure
-  transport:
-    ssh_key: ~/.ssh/id_rsa
+platforms:
+- name: centos-6
   driver:
-    name: azurerm
-  driver_config:
-    vm_name: azl-tst-kit-01
-    subscription_id: '9db13c96-62ad-4945-9579-74aeed296e48'
-    location: East US 2
-    machine_size: Standard_D4S_v3
-    image_urn: OpenLogic:CentOS:7.3:latest
-    data_disks:
-      - lun: 0
-        disk_size_gb: 979
-    vnet_id: /subscriptions/9db13c96-62ad-4945-9579-74aeed296e48/resourceGroups/AZ-RG-Network/providers/Microsoft.Network/virtualNetworks/AZ-VN-EastUS2-01
-    subnet_id: AZ-SN-front
+    image: centos:6
 
-- name: centos-7.4-local
-  transport:
-    name: ssh
-    username: vagrant
-    password: vagrant
+- name: centos-7
   driver:
-    box: bento/centos-7.4
-    customize:
-      createhd:
-        - filename: disk1.vdi
-          size: 1002496
-      storageattach:
-        - storagectl: SATA Controller
-          port: 1
-          device: 0
-          type: hdd
-          medium: disk1.vdi
-    network:
-      - ['private_network', {ip: '192.168.56.12'}]
+    image: centos:7
     
 suites:
   - name: default
     run_list:
       - recipe[cb_dvo_jenkins::default]
-  data_bags_path: test/integration/data_bags
-  environments_path: test/integration/environments
