@@ -7,6 +7,8 @@ ARG USER_ID=1000
 ARG GROUP_ID=1000
 ENV DEBIAN_FRONTEND=noninteractive \
     PATH=/opt/chefdk/bin:/opt/chefdk/embedded/bin:/root/.chefdk/gem/ruby/2.5.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+RUN useradd -m -d /home/jenkins -s /bin/sh jenkins
 #prereqs
 RUN apt-get update && \
     apt-get install -y apt-transport-https ca-certificates curl software-properties-common wget ssh
@@ -20,5 +22,8 @@ RUN wget --quiet --content-disposition "http://packages.chef.io/files/${CHANNEL}
     chef gem install kitchen-docker && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* 
+    groupmod -g ${GROUP_ID} jenkins && \
+    usermod -u ${USER_ID} -g ${GROUP_ID} ${USER} && \
+    adduser ${USER} docker
 USER jenkins
 VOLUME /var/run/docker.sock
