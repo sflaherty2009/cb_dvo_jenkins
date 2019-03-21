@@ -1,7 +1,7 @@
 ---
 
 driver:
-  name: vagrant
+  name: docker
 
 provisioner:
   name: chef_zero
@@ -32,7 +32,7 @@ platforms:
         disk_size_gb: 979
     vnet_id: /subscriptions/9db13c96-62ad-4945-9579-74aeed296e48/resourceGroups/AZ-RG-Network/providers/Microsoft.Network/virtualNetworks/AZ-VN-EastUS2-01
     subnet_id: AZ-SN-front
-    
+
 - name: centos-7.4-local
   transport:
     name: ssh
