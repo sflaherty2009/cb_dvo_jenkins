@@ -32,7 +32,7 @@ def notifySlack(text, channel, username, attachments) {
     attachments: attachments
   ])
 
-  sh &quot;curl -X POST --data-urlencode &apos;payload=${payload}&apos; ${slackURL}&quot;
+  sh &quot;curl -s -X POST --data-urlencode &apos;payload=${payload}&apos; ${slackURL}&quot;
 }
 
 node{
