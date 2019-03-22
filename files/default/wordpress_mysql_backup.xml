@@ -19,7 +19,7 @@
 env.MYSQL_HOST = &apos;trek-wordpress-mysql.mysql.database.azure.com&apos;
 env.MYSQL_AZURE_SUBSCRIPTION_ID = &apos;f7274d08-200b-4f00-9989-c077287b3aa3&apos;
 
-def slackNotificationChannel = &quot;#devops-test&quot;
+def slackNotificationChannel = &quot;#alerts-devops_builds&quot;
 def slackUsername = &quot;The Backerupper&quot;
 
 def notifySlack(text, channel, username, attachments) {
