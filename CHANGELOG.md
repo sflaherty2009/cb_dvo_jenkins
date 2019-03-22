@@ -2,9 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-### Changed 
+## [0.2.52] - 2019-03-13
 
-## [0.25.1] - 2019-03-07 
+- Configured mysql backup job for trek-wordpress-mysql.
+
+## [0.2.51] - 2019-03-07
 
 - Added init script for adding components needed for knife commands.
 - Modified vm_agent.rb so that SAS key was not sitting in plain text in vm_agent recipe.
