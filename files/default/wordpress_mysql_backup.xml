@@ -43,7 +43,7 @@ node{
         docker.withRegistry(&apos;https://conbase.azurecr.io&apos;, &apos;conBase&apos;) {
           image = docker.image(&apos;conbase.azurecr.io/azbackup:1.0&apos;)
           image.pull()
-          sh &quot;docker run -e MYSQL_USER -e MYSQL_PASSWORD -e MYSQL_HOST -e AZURE_CLIENT_ID -e AZURE_CLIENT_SECRET -e AZURE_TENANT_ID -e AZURE_SUBSCRIPTION_ID conbase.azurecr.io/azbackup:1.0&quot;
+          sh &quot;docker run -e MYSQL_USER -e MYSQL_PASSWORD -e MYSQL_HOST -e AZURE_CLIENT_ID -e AZURE_CLIENT_SECRET -e AZURE_TENANT_ID -e AZURE_SUBSCRIPTION_ID -e MYSQL_AZURE_SUBSCRIPTION_ID conbase.azurecr.io/azbackup:1.0&quot;
         }
         sh &apos;docker container prune --force&apos;
       }
