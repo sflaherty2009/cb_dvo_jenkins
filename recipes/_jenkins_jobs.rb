@@ -1,4 +1,4 @@
-jobs = run_context.cookbook_collection['cookbook_name']
+jobs = run_context.cookbook_collection['cb_dvo_jenkins']
 
 jobs.manifest['files'].each do |job|
   filename = job['name']
