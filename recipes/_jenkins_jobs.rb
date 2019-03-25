@@ -11,6 +11,6 @@ jobs.each do |job|
   job_name = name.chomp('.xml')
 
   jenkins_job job_name do
-    config name
+    config "#{Chef::Config[:file_cache_path]}/#{name}"
   end
 end
