@@ -10,10 +10,11 @@
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers>
-    <bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.BitbucketBuildTrigger plugin="bitbucket-pullrequest-builder@1.4.28">
+    <bitbucketpullrequestbuilder.bitbucketpullrequestbuilder.BitbucketBuildTrigger plugin="bitbucket-pullrequest-builder@1.4.30">
       <spec>* * * * * </spec>
+      <bitbucketServer></bitbucketServer>
       <cron>* * * * * </cron>
-      <credentialsId>grant_pierce</credentialsId>
+      <credentialsId>TrekDevOps</credentialsId>
       <username></username>
       <password></password>
       <repositoryOwner>trekbikes</repositoryOwner>
