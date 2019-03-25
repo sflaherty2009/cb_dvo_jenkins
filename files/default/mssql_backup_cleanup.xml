@@ -1,10 +1,10 @@
 <?xml version='1.1' encoding='UTF-8'?>
 <flow-definition plugin="workflow-job@2.32">
   <actions/>
-  <description>Cleans up the aztrksal0420eu20dbbackup/operational blob storage container. Retains .bak files for two months and .trn files for two weeks.</description>
+  <description>Cleans up the aztrksal0420eu20dbbackup/operational blob storage container and all file shares. Maintains backup files as specified in Trek&apos;s retention policy (https://trekbikes.atlassian.net/wiki/spaces/DVO/pages/427098217/Backups).</description>
   <keepDependencies>false</keepDependencies>
   <properties>
-  <jenkins.model.BuildDiscarderProperty>
+    <jenkins.model.BuildDiscarderProperty>
       <strategy class="hudson.tasks.LogRotator">
         <daysToKeep>-1</daysToKeep>
         <numToKeep>30</numToKeep>
@@ -16,7 +16,7 @@
     <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
       <triggers>
         <hudson.triggers.TimerTrigger>
-          <spec>0 4 * * *</spec>
+          <spec>H H(3-6) * * *</spec>
         </hudson.triggers.TimerTrigger>
       </triggers>
     </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
@@ -43,11 +43,11 @@ def notifySlack(text, channel, username, attachments) {
 node{
   try {
     stage(&apos;Cleaning up MSSQL backups&apos;) {
-      withCredentials([usernamePassword(azureServicePrincipal(&apos;azureCreds&apos;)]) {
+      withCredentials([azureServicePrincipal(&apos;azureCreds&apos;)]) {
         docker.withRegistry(&apos;https://conbase.azurecr.io&apos;, &apos;conBase&apos;) {
           image = docker.image(&apos;conbase.azurecr.io/azbackup:1.0&apos;)
           image.pull()
-          sh &quot;docker run --entrypoint &apos;/mssqlbackupretention.sh&apos; -e AZURE_CLIENT_ID -e AZURE_CLIENT_SECRET -e AZURE_TENANT_ID -e AZURE_SUBSCRIPTION_ID conbase.azurecr.io/azbackup:1.0&quot;
+          sh &quot;docker run --entrypoint &apos;/mssqlbackupcleanup.sh&apos; -e AZURE_CLIENT_ID -e AZURE_CLIENT_SECRET -e AZURE_TENANT_ID -e AZURE_SUBSCRIPTION_ID conbase.azurecr.io/azbackup:1.0&quot;
         }
         sh &apos;docker container prune --force&apos;
       }
