@@ -2,6 +2,7 @@
 <flow-definition plugin="workflow-job@2.29">
   <actions/>
   <description></description>
+  <displayName>Hybris Auto Deploy Skip</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
@@ -38,63 +39,86 @@
   <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.60">
     <script>import groovy.json.JsonOutput
 
-def dockerRun(command, config) {
-    sh &quot;docker run --add-host=AZL-ChefServer-01:10.16.192.4 \
-        -v /home/jenkinsAdmin:/home/root chef/chefdk knife ${command} \
-        --config ${config}&quot;
-}
+def slackNotificationChannel = &quot;#devops-test&quot;
+def slackUsername = &quot;Skip the Deployment Skipper&quot;
 def twelvehour = (env.Window.replaceAll(&quot;.*\\(&quot;, &quot;&quot;).replaceAll(&quot;\\)&quot;,&quot;&quot;).trim())
 def twentyfourhour = (env.Window.replaceAll(&quot;\\(.*\\)&quot;, &quot;&quot;).trim())
-def slackNotificationChannel = &quot;#devops-test&quot;
-def notifySlack(text, channel, attachments) {
-    def slackURL = &apos;https://hooks.slack.com/services/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&apos;
-    def jenkinsIcon = &apos;https://wiki.jenkins-ci.org/download/attachments/2916393/logo.png&apos;
 
-    def payload = JsonOutput.toJson([text: text,
-        channel: channel,
-        username: &quot;The Deployment Skipper&quot;,
-        icon_url: jenkinsIcon,
-        attachments: attachments
-    ])
+def notifySlack(text, channel, username, attachments) {
+  def slackURL = &apos;https://hooks.slack.com/services/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&apos;
+  def jenkinsIcon = &apos;https://trekbikescdndev.blob.core.windows.net/hybris/avatars/devops/avatar-02.png&apos;
 
-    sh &quot;curl -X POST --data-urlencode \&apos;payload=${payload}\&apos; ${slackURL}&quot;
+  def payload = JsonOutput.toJson([text: text,
+    channel: channel,
+    username: username,
+    icon_url: jenkinsIcon,
+    attachments: attachments
+  ])
+
+  sh &quot;curl -X POST --data-urlencode \&apos;payload=${payload}\&apos; ${slackURL}&quot;
+}
+
+def dockerRun(command) {
+  def config = &quot;--config home/root/jenkins.rb&quot;
+  sh &quot;docker run --add-host=AZL-ChefServer-01:10.16.192.4 \
+    -v /home/jenkinsAdmin:/home/root chef/chefdk ${command} \
+    ${config}&quot;
 }
 
 node {
+  try {
     stage(&apos;Update Attribute&apos;) {
-        dockerRun(&quot;exec -E \&apos;nodes.find(\&quot;name:azl-${env.Environment}-hyb*\&quot;) \
-        {|n| n.normal[\&quot;dvo_user\&quot;][\&quot;hybris\&quot;][\&quot;auto\&quot;][\&quot;$twentyfourhour\&quot;]=false; n.save}\&apos;&quot;, &quot;/home/root/jenkins.rb&quot;)
+      dockerRun(&quot;knife exec -E \&apos;nodes.find(\&quot;name:azl-${env.Environment}-hyb*\&quot;) \
+      {|n| n.normal[\&quot;dvo_user\&quot;][\&quot;hybris\&quot;][\&quot;auto\&quot;][\&quot;$twentyfourhour\&quot;]=false; n.save}\&apos;&quot;)
     }
-        
+
     stage(&apos;Update Crontab&apos;) {
-        withCredentials([[$class: &apos;UsernamePasswordMultiBinding&apos;, credentialsId: &apos;local_admin&apos;,
-        usernameVariable: &apos;USERNAME&apos;, passwordVariable: &apos;PASSWORD&apos;]]) {
-            dockerRun(&quot;ssh \&quot;name:azl-${env.Environment}-hyb*\&quot; \
-            \&quot;sudo chef-client -o cb_dvo_hybris::auto\&quot; -x ${env.USERNAME} -P \&apos;${env.PASSWORD}\&apos;&quot;, &quot;/home/root/jenkins.rb&quot;)
-        }
+      withCredentials([[$class: &apos;UsernamePasswordMultiBinding&apos;, credentialsId: &apos;local_admin&apos;,
+      usernameVariable: &apos;USERNAME&apos;, passwordVariable: &apos;PASSWORD&apos;]]) {
+        dockerRun(&quot;knife ssh \&quot;name:azl-${env.Environment}-hyb*\&quot; \
+        \&quot;sudo chef-client -o cb_dvo_hybris::auto\&quot; -x ${env.USERNAME} -P \&apos;${env.PASSWORD}\&apos;&quot;)
+      }
     }
-    
+
     stage(&apos;Send Slack Message&apos;) {
-        notifySlack(&quot;&quot;, slackNotificationChannel, [
+      notifySlack(&quot;&quot;, slackNotificationChannel, slackUsername, [
+        [
+          color: &quot;good&quot;,
+          text: &quot;The following auto-deployment window will be skipped:&quot;,
+          &quot;mrkdwn_in&quot;: [&quot;fields&quot;],
+          fields: [
             [
-                color: &quot;good&quot;,
-                text: &quot;The following auto-deployment window will be skipped:&quot;,
-                &quot;mrkdwn_in&quot;: [&quot;fields&quot;],
-                fields: [
-                    [
-                        title: &quot;Timing Window&quot;,
-                        value: &quot;${twelvehour}&quot;,
-                        short: true
-                    ],
-                    [
-                        title: &quot;Node&quot;,
-                        value: &quot;azl-${env.Environment}-hyb-01&quot;,
-                        short: true
-                    ]
-                ]
+              title: &quot;Timing Window&quot;,
+              value: &quot;${twelvehour}&quot;,
+              short: true
+            ],
+            [
+              title: &quot;Node&quot;,
+              value: &quot;azl-${env.Environment}-hyb-01&quot;,
+              short: true
             ]
-        ])
+          ]
+        ]
+      ])
     }
+  } catch (e) {
+    notifySlack(&quot;&quot;, slackNotificationChannel, slackUsername, [
+      [
+        color: &quot;danger&quot;,
+        text: &quot;Something went wrong while attempting to skip a deployment window:&quot;,
+        &quot;mrkdwn_in&quot;: [&quot;fields&quot;],
+        fields: [
+          [
+            title: &quot;Error&quot;,
+            value: e.getMessage().toString(),
+            short: false
+          ]
+        ]
+      ]
+    ])
+
+    throw e
+  }
 }</script>
     <sandbox>true</sandbox>
   </definition>

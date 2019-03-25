@@ -1,50 +1,46 @@
-node{
-    stage ("Repo Pull"){
-        if (fileExists("/data/cookbooks/${env.JOB_NAME}")) {
-            sh "cd /data/cookbooks/${env.JOB_NAME}; git pull"
-            if (fileExists("/data/cookbooks/${env.JOB_NAME}/Berksfile.lock")){
-                sh """
-                    source /etc/profile
-                    cd /data/cookbooks/${env.JOB_NAME}
-                    berks update
-                """
-            }
-            else{
-                sh "mkdir -p mkdir /data/cookbooks/${env.JOB_NAME}/.berkshelf"
-                sh "echo '{\"ssl\": {\"verify\": false}}' > /data/cookbooks/${env.JOB_NAME}/.berkshelf/config.json; echo -e \"source :chef_server\nsource 'https://supermarket.chef.io'\n\nmetadata\" > /data/cookbooks/${env.JOB_NAME}/Berksfile"
-                sh """
-                    cd /data/cookbooks/${env.JOB_NAME}
-                    berks install
-                """
-            }
-        } else {
-            sh "git clone https://TrekDevOps:WQrULM66cGyPyB@bitbucket.org/trekbikes/${env.JOB_NAME}.git /data/cookbooks/${env.JOB_NAME}"
-            sh "mkdir -p mkdir /data/cookbooks/${env.JOB_NAME}/.berkshelf"
-            sh "echo '{\"ssl\": {\"verify\": false}}' > /data/cookbooks/${env.JOB_NAME}/.berkshelf/config.json; echo -e \"source :chef_server\nsource 'https://supermarket.chef.io'\n\nmetadata\" > /data/cookbooks/${env.JOB_NAME}/Berksfile"
-            sh """
-                cd /data/cookbooks/${env.JOB_NAME}
-                berks install
-            """
-        }
+pipeline {
+  agent {
+    dockerfile {
+      filename 'Dockerfile'
+      args '--net host -u 0:0 -v /var/run/docker.sock:/var/run/docker.sock'
     }
-    stage("lint testing"){
-        sh "foodcritic /data/cookbooks/${env.JOB_NAME} --epic-fail any"
-    }
-    stage("syntax testing"){
-        sh "rubocop /data/cookbooks/${env.JOB_NAME}"
-    }
-    stage("testing cookbook"){
-        sh "cd /data/cookbooks/${env.JOB_NAME}; kitchen test"
-    }
-    stage("push to chef server"){
-       sh """
-        source /etc/profile
-        cd /data/cookbooks/${env.JOB_NAME}
-        berks upload
-       """
-    }
-}
 
-// TO DO 
-// Add Kitchen.yml replacement for cookbook when it is run. 
-// Figure out a way to do restart with test-kitchen. 
+  }
+  stages {
+    stage('Chef') {
+      steps {
+        parallel(
+          "Chef Cookbook Unit": {
+            chef_cookbook_unit()
+
+          },
+          "Chef Cookbook Lint": {
+            chef_cookbook_foodcritic()
+            chef_cookbook_cookstyle()
+
+          },
+          "Chef Cookbook Functional": {
+              chef_cookbook_functional()
+          }
+        )
+      }
+      post {
+        always {
+          warnings(canComputeNew: false, canResolveRelativePaths: false, categoriesPattern: '', consoleParsers: [[parserName: 'ChefCookbookLint']], defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', messagesPattern: '', unHealthy: '')
+          junit '*_junit.xml'
+          archive '*_junit.xml'
+
+        }
+
+      }
+    }
+    stage('Publish to Chef Server') {
+      when {
+          branch 'master'
+      }
+      steps {
+          chef_cookbook_publish_chef()
+      }
+    }
+  }
+}

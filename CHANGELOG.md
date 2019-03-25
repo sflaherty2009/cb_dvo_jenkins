@@ -2,13 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.2.53] - 2019-03-22
+## [0.2.64] - 2019-03-22
 
 - Configured cleanup job for MSSQL operational backup blobs.
 
-## [0.2.52] - 2019-03-21
+## [0.2.63] - 2019-03-21
 
 - Configured mysql backup job for trek-wordpress-mysql.
+
+## [0.2.52] - 2019-03-18
+
+### Changed
+
+- Added proper display names for deploy skip, traffic drain and acr cleanup
+- Added database backup job
+- Fixed refresh job
 
 ## [0.2.51] - 2019-03-07
 

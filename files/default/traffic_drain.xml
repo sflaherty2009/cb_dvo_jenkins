@@ -2,6 +2,7 @@
 <flow-definition plugin="workflow-job@2.29">
   <actions/>
   <description></description>
+  <displayName>Web Traffic Drain</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.model.ParametersDefinitionProperty>
@@ -25,6 +26,8 @@
               <string>hyb-03</string>
               <string>hyb-04</string>
               <string>hyb-05</string>
+              <string>hyb-06</string>
+              <string>hyb-07</string>
             </a>
           </choices>
         </hudson.model.ChoiceParameterDefinition>
@@ -35,12 +38,11 @@
     <script>import groovy.json.JsonOutput
 
 def slackNotificationChannel = &quot;#devops-test&quot;
-def slackUsername = &quot;The Traffic Drainer&quot;
-def webServers = [&quot;azl-${env.environment}-web-01&quot;,&quot;azl-${env.environment}-web-02&quot;,&quot;azl-${env.environment}-web-03&quot;]
+def slackUsername = &quot;Tony the Traffic Drainer&quot;
 
 def notifySlack(text, channel, username, attachments) {
   def slackURL = &apos;https://hooks.slack.com/services/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&apos;
-  def jenkinsIcon = &apos;https://wiki.jenkins-ci.org/download/attachments/2916393/logo.png&apos;
+  def jenkinsIcon = &apos;https://trekbikescdndev.blob.core.windows.net/hybris/avatars/devops/avatar-08.png&apos;
 
   def payload = JsonOutput.toJson([text: text,
     channel: channel,
@@ -52,32 +54,39 @@ def notifySlack(text, channel, username, attachments) {
   sh &quot;curl -X POST --data-urlencode \&apos;payload=${payload}\&apos; ${slackURL}&quot;
 }
 
+def dockerRun(command, params) {
+  def config = &apos;--config /home/root/jenkins.rb&apos;
+  sh ( script: &quot;docker run --add-host=AZL-ChefServer-01:10.16.192.4 \
+    -v /home/jenkinsAdmin:/home/root chef/chefdk ${command} \
+    ${config} ${params}&quot;, returnStdout: true).trim()
+}
+
 def curlCommand(user, password, webServer, command) {
   sh ( script: &quot;curl -s -u ${user}:${password} \&quot;${webServer}.trek.web:6969/balancer-manager\&quot; | ${command}&quot;, returnStdout: true ).trim()
 }
 
-def trafficDrain(user, password, servers, hybrisNode){
-  servers.each { server -&gt;
-    def nonce = curlCommand(user, password, server, &quot;grep nonce | grep \&quot;hybris-content-ssl\&quot; | sed \&quot;s/.*nonce=\\(.*\\)[&apos;\\\&quot;].*/\\1/\&quot; | tail -n 1&quot;)
-    def toggle = curlCommand(user, password, server, &quot;grep \&quot;azl-${env.environment}-${hybrisNode}\&quot; | grep -c \&quot;Init Ok\&quot; || echo \$1&quot;)
-    buildColor = toggle == &apos;1&apos; ? &quot;warning&quot; : &quot;good&quot;
-    buildStatus = toggle == &apos;1&apos; ? &quot;Draining Traffic&quot; : &quot;Traffics a Flowin&quot;
+def trafficDrain(servers, hybrisNode){
+  withCredentials([[$class: &apos;UsernamePasswordMultiBinding&apos;, credentialsId: &apos;apache_devops&apos;, usernameVariable: &apos;USERNAME&apos;, passwordVariable: &apos;PASSWORD&apos;]]) {
+    servers.each { server -&gt;
+      def nonce = curlCommand(env.USERNAME, env.PASSWORD, server, &quot;grep nonce | grep \&quot;hybris-content-ssl\&quot; | sed \&quot;s/.*nonce=\\(.*\\)[&apos;\\\&quot;].*/\\1/\&quot; | tail -n 1&quot;)
+      def toggle = curlCommand(env.USERNAME, env.PASSWORD, server, &quot;grep \&quot;azl-${env.environment}-${hybrisNode}\&quot; | grep -c \&quot;Init Ok\&quot; || echo \$1&quot;)
+      buildColor = toggle == &apos;1&apos; ? &quot;warning&quot; : &quot;good&quot;
+      buildStatus = toggle == &apos;1&apos; ? &quot;Draining Traffic&quot; : &quot;Traffics a Flowin&quot;
 
-    sh &quot;curl -s -o /dev/null -u ${user}:${password} -XPOST \&quot;http://${server}.trek.web:6969/balancer-manager?\&quot; \
-        -d b=\&quot;hybris-content-ssl\&quot; \
-        -d w=\&quot;ajp://azl-${env.environment}-${hybrisNode}\&quot; \
-        -d nonce=\&quot;${nonce}\&quot; \
-        -d w_status_N=\&quot;${toggle}\&quot;&quot;
+      sh &quot;curl -s -o /dev/null -u ${env.USERNAME}:${env.PASSWORD} -XPOST \&quot;http://${server}.trek.web:6969/balancer-manager?\&quot; \
+          -d b=\&quot;hybris-content-ssl\&quot; \
+          -d w=\&quot;ajp://azl-${env.environment}-${hybrisNode}\&quot; \
+          -d nonce=\&quot;${nonce}\&quot; \
+          -d w_status_N=\&quot;${toggle}\&quot;&quot;
+    }
   }
 }
 
 node{
   try {
     stage(&apos;Toggling Draining&apos;) {
-      withCredentials([[$class: &apos;UsernamePasswordMultiBinding&apos;, credentialsId: &apos;apache_devops&apos;,
-      usernameVariable: &apos;USERNAME&apos;, passwordVariable: &apos;PASSWORD&apos;]]) {
-        trafficDrain(env.USERNAME, env.PASSWORD, webServers, env.hybrisNode)
-      }
+      webServers = dockerRun(&quot;knife search node &apos;name:azl-${env.environment}-web*&apos; -i&quot;, &quot;2&gt; /dev/null | sed &apos;s/-AZ-RG.*//g&apos; | sort&quot;).split(&apos;\n&apos;)
+      trafficDrain(webServers, env.hybrisNode)
 
       notifySlack(&quot;&quot;, slackNotificationChannel, slackUsername, [
         [
