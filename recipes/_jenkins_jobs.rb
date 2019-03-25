@@ -1,15 +1,15 @@
-jobs = run_context.cookbook_collection['cb_dvo_jenkins']
+jobs = run_context.cookbook_collection[:examplecookbook].files_for('files')
 
-jobs.manifest['files'].each do |job|
+jobs.each do |job|
   filename = job['name']
   cookbook_file "#{Chef::Config[:file_cache_path]}/#{filename}" do
     source filename
     action :create
   end
 
-  job_xml = File.join(Chef::Config[:file_cache_path], filename)
+  job = filename.tr('.xml','')
 
   jenkins_job filename do
-    config job_xml
+    config filename
   end
 end
