@@ -7,9 +7,9 @@ jobs.each do |job|
     action :create
   end
 
-  job = filename.tr('.xml','')
+  job_name = filename.tr('.xml', '')
 
-  jenkins_job filename do
+  jenkins_job job_name do
     config filename
   end
 end
