@@ -1,4 +1,4 @@
-jobs = run_context.cookbook_collection[cb_dvo_jenkins].template_filenames
+jobs = run_context.cookbook_collection[cookbook_name].template_filenames
 
 jobs.each do |job|
   cookbook_file "#{Chef::Config[:file_cache_path]}/#{job}" do
