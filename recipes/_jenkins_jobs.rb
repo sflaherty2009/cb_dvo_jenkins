@@ -1,9 +1,8 @@
-jobs = run_context.cookbook_collection[:cb_dvo_jenkins].files_for('files')
+jobs = run_context.cookbook_collection[:cb_dvo_jenkins].files_for()
 
 jobs.each do |job|
   filename = job['name']
-  path = job['path']
-  cookbook_file path do
+  cookbook_file "#{Chef::Config[:file_cache_path]}/#{filename}" do
     source filename
     action :create
   end
