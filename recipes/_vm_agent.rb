@@ -80,7 +80,7 @@ jenkins_script 'vm_agent_linux' do
       .addNewTemplate()
           .withName("jenkinsagent")
           .withLabels("jenkinsagent")
-          .withLocation("East US")
+          .withLocation("East US 2")
           .withVirtualMachineSize("Standard_DS2_v2")
           .withNewStorageAccount("")
           .addNewAdvancedImage()
