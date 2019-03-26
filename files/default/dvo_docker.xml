@@ -1,19 +1,213 @@
+<?xml version='1.1' encoding='UTF-8'?>
 <flow-definition plugin="workflow-job@2.32">
-<actions/>
-<description/>
-<displayName>Hybris Manual Container Build</displayName>
-<keepDependencies>false</keepDependencies>
-<properties>
-<org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
-<triggers/>
-</org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
-</properties>
-<definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.64">
-<script>
-import groovy.json.JsonOutput import java.util.Optional def slackNotificationChannel = "#alerts-devops_builds" def slackUsername = "Craig the Containerer" def author = "" def message = "" def notifySlack(text, channel, username, attachments) { def slackURL = 'https://hooks.slack.com/services/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' def jenkinsIcon = 'https://trekbikescdndev.blob.core.windows.net/hybris/avatars/devops/avatar-04.png' def payload = JsonOutput.toJson([text: text, channel: channel, username: username, icon_url: jenkinsIcon, attachments: attachments ]) sh "curl -X POST --data-urlencode \'payload=${payload}\' ${slackURL}" } def getTag = { tag = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim() } def getCommit = { commit = sh(returnStdout: true, script: 'git rev-parse HEAD').trim() author = sh(returnStdout: true, script: "git --no-pager show -s --format='%an' ${commit}").trim() message = sh(returnStdout: true, script: 'git log -1 --pretty=%B').trim() pretty = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim() } def dockerBuild = { docker.withRegistry('https://conbase.azurecr.io', 'conBase'){ build = docker.build("conhybris.azurecr.io/hybris-${environment}:${tag}"," --build-arg PENV=${environment.replace('arm','')} .") } } def dockerCleanup = { searchCriteria = 'docker images conhybris.azurecr.io/* -q --no-trunc' sh "docker rmi \$(${searchCriteria}) -f" } def populateGlobalVariables = { getTag() getCommit() } node { try { stage('Checkout'){ environment = input( id: 'environment', message: 'User input required', ok: 'ok', parameters: [choice(name: 'environment', choices: 'dev2\ndev3\ne2e\nmadone\nproofing\ndomane\ntestarm\ntest2\nprodarm', description: 'What environment are we building for?')]) branch = input( id: 'branch', message: 'Branch to build: ', ok: 'ok', parameters: [string(defaultValue: 'master', description: '.....', name: 'branch')]) base_version = input( id: 'base_version', message: 'Hybris base container to use: ', ok: 'ok', parameters: [string(defaultValue: '6.6.0.8.0ca7eaf', description: '.....', name: 'base container version')]) git credentialsId: "TrekDevOps", url: 'https://bitbucket.org/trekbikes/tbc.git', branch: "${branch}" } stage('Docker Build') { populateGlobalVariables() sh """ echo 'commit: ${commit}' > .commit; echo 'author: ${author}' >> .commit; echo 'message: ${message}' >> .commit; echo 'pretty: ${pretty}' >> .commit """ def buildColor = currentBuild.result == null ? "good" : "warning" def buildStatus = currentBuild.result == null ? "Success" : currentBuild.result notifySlack("", slackNotificationChannel, slackUsername, [ [ color: "#439FE0", title: "Hybris Manual Container Build, build #${env.BUILD_NUMBER}", title_link: "${env.RUN_DISPLAY_URL}", text: "Container build has started for the ${environment} environment.", "mrkdwn_in": ["fields"], fields: [ [ title: "Branch", value: "${branch}", short: true ], [ title: "Author", value: "${author}", short: true ], [ title: "Last Commit", value: "${message} (<https://bitbucket.org/trekbikes/tbc/commits/${commit}|${pretty}>)", short: false ] ] ] ]) dockerBuild() } stage('Docker Push') { def buildColor = currentBuild.result == null ? "good" : "warning" def buildStatus = currentBuild.result == null ? "Success" : currentBuild.result docker.withRegistry('https://conhybris.azurecr.io', 'conHybris'){ build.push() build.push('latest') } notifySlack("", slackNotificationChannel, slackUsername, [ [ title: "Hybris Manual Container Build, build #${env.BUILD_NUMBER}", title_link: "${env.RUN_DISPLAY_URL}", color: "${buildColor}", text: "${buildStatus}", "mrkdwn_in": ["fields"], fields: [ [ title: "Environment", value: "${environment}", short: true ], [ title: "Container Tag", value: "${tag}", short: true ], [ title: "Author", value: "${author}", short: true ], [ title: "Runtime", value: "${currentBuild.durationString}", short: true ] ] ] ]) } stage('Docker Cleanup') { dockerCleanup() } } catch (e) { def buildStatus = "Failed" notifySlack("", slackNotificationChannel, slackUsername, [ [ title: "Hybris Manual Container Build, build #${env.BUILD_NUMBER}", title_link: "${env.RUN_DISPLAY_URL}", color: "danger", text: "${buildStatus}", "mrkdwn_in": ["fields"], fields: [ [ title: "Branch", value: "${branch}", short: true ], [ title: "Author", value: "${author}", short: true ], [ title: "Last Commit", value: "${message} (<https://bitbucket.org/trekbikes/tbc/commits/${commit}|${pretty}>)", short: false ], [ title: "Error", value: "${e}", short: false ] ] ] ]) throw e } }
-</script>
-<sandbox>true</sandbox>
-</definition>
-<triggers/>
-<disabled>false</disabled>
+  <actions/>
+  <description></description>
+  <displayName>Hybris Manual Container Build</displayName>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+      <triggers/>
+    </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.64">
+    <script>import groovy.json.JsonOutput
+import java.util.Optional
+
+def slackNotificationChannel = &quot;#devops-test&quot;
+def slackUsername = &quot;Craig the Containerer&quot;
+def author = &quot;&quot;
+def message = &quot;&quot;
+
+def notifySlack(text, channel, username, attachments) {
+  def slackURL = &apos;https://hooks.slack.com/services/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&apos;
+  def jenkinsIcon = &apos;https://trekbikescdndev.blob.core.windows.net/hybris/avatars/devops/avatar-04.png&apos;
+
+  def payload = JsonOutput.toJson([text: text,
+    channel: channel,
+    username: username,
+    icon_url: jenkinsIcon,
+    attachments: attachments
+  ])
+
+  sh &quot;curl -X POST --data-urlencode \&apos;payload=${payload}\&apos; ${slackURL}&quot;
+}
+
+def getTag = {
+  tag = sh(returnStdout: true, script: &quot;git log -n 1 --pretty=format:&apos;%h&apos;&quot;).trim()
+}
+
+def getCommit = {
+  commit = sh(returnStdout: true, script: &apos;git rev-parse HEAD&apos;).trim()
+  author = sh(returnStdout: true, script: &quot;git --no-pager show -s --format=&apos;%an&apos; ${commit}&quot;).trim()
+  message = sh(returnStdout: true, script: &apos;git log -1 --pretty=%B&apos;).trim()
+  pretty = sh(returnStdout: true, script: &quot;git log -n 1 --pretty=format:&apos;%h&apos;&quot;).trim()
+}
+
+def dockerBuild = {
+  docker.withRegistry(&apos;https://conbase.azurecr.io&apos;, &apos;conBase&apos;){
+    build = docker.build(&quot;conhybris.azurecr.io/hybris-${environment}:${tag}&quot;,&quot; --build-arg PENV=${environment.replace(&apos;arm&apos;,&apos;&apos;)} .&quot;)
+  }
+}
+
+def dockerCleanup = {
+  searchCriteria = &apos;docker images conhybris.azurecr.io/* -q --no-trunc&apos;
+  sh &quot;docker rmi \$(${searchCriteria}) -f&quot;
+}
+
+def populateGlobalVariables = {
+  getTag()
+  getCommit()
+}
+
+node {
+  try {
+    stage(&apos;Checkout&apos;){
+      environment = input(
+        id: &apos;environment&apos;,
+        message: &apos;User input required&apos;,
+        ok: &apos;ok&apos;,
+        parameters: [choice(name: &apos;environment&apos;, choices: &apos;dev2\ndev3\ne2e\nmadone\nproofing\ndomane\ntestarm\ntest2\nprodarm&apos;,
+        description: &apos;What environment are we building for?&apos;)])
+      branch = input(
+        id: &apos;branch&apos;,
+        message: &apos;Branch to build: &apos;,
+        ok: &apos;ok&apos;,
+        parameters: [string(defaultValue: &apos;master&apos;, description: &apos;.....&apos;, name: &apos;branch&apos;)])
+      base_version = input(
+        id: &apos;base_version&apos;,
+        message: &apos;Hybris base container to use: &apos;,
+        ok: &apos;ok&apos;, parameters: [string(defaultValue: &apos;6.6.0.8.0ca7eaf&apos;, description: &apos;.....&apos;, name: &apos;base container version&apos;)])
+        
+      git credentialsId: &quot;TrekDevOps&quot;, url: &apos;https://bitbucket.org/trekbikes/tbc.git&apos;, branch: &quot;${branch}&quot;
+    }
+
+    stage(&apos;Docker Build&apos;) {
+      populateGlobalVariables()
+      sh &quot;&quot;&quot;
+      echo &apos;commit: ${commit}&apos; &gt; .commit;
+      echo &apos;author: ${author}&apos; &gt;&gt; .commit;
+      echo &apos;message: ${message}&apos; &gt;&gt; .commit;
+      echo &apos;pretty: ${pretty}&apos; &gt;&gt; .commit
+      &quot;&quot;&quot;
+
+      def buildColor = currentBuild.result == null ? &quot;good&quot; : &quot;warning&quot;
+      def buildStatus = currentBuild.result == null ? &quot;Success&quot; : currentBuild.result
+
+      notifySlack(&quot;&quot;, slackNotificationChannel, slackUsername, [
+        [
+          color: &quot;#439FE0&quot;,
+          title: &quot;Hybris Manual Container Build, build #${env.BUILD_NUMBER}&quot;,
+          title_link: &quot;${env.RUN_DISPLAY_URL}&quot;,
+          text: &quot;Container build has started for the ${environment} environment.&quot;,
+          &quot;mrkdwn_in&quot;: [&quot;fields&quot;],
+          fields: [
+            [
+              title: &quot;Branch&quot;,
+              value: &quot;${branch}&quot;,
+              short: true
+            ],
+            [
+              title: &quot;Author&quot;,
+              value: &quot;${author}&quot;,
+              short: true
+            ],
+            [
+              title: &quot;Last Commit&quot;,
+              value: &quot;${message} (&lt;https://bitbucket.org/trekbikes/tbc/commits/${commit}|${pretty}&gt;)&quot;,
+              short: false
+            ]
+          ]
+        ]
+      ])
+
+      dockerBuild()
+    }
+
+    stage(&apos;Docker Push&apos;) {
+      def buildColor = currentBuild.result == null ? &quot;good&quot; : &quot;warning&quot;
+      def buildStatus = currentBuild.result == null ? &quot;Success&quot; : currentBuild.result
+
+      docker.withRegistry(&apos;https://conhybris.azurecr.io&apos;, &apos;conHybris&apos;){
+        build.push()
+        build.push(&apos;latest&apos;)
+      }
+
+      notifySlack(&quot;&quot;, slackNotificationChannel, slackUsername, [
+        [
+          title: &quot;Hybris Manual Container Build, build #${env.BUILD_NUMBER}&quot;,
+          title_link: &quot;${env.RUN_DISPLAY_URL}&quot;,
+          color: &quot;${buildColor}&quot;,
+          text: &quot;${buildStatus}&quot;,
+          &quot;mrkdwn_in&quot;: [&quot;fields&quot;],
+          fields: [
+            [
+              title: &quot;Environment&quot;,
+              value: &quot;${environment}&quot;,
+              short: true
+            ],
+            [
+              title: &quot;Container Tag&quot;,
+              value: &quot;${tag}&quot;,
+              short: true
+            ],
+            [
+              title: &quot;Author&quot;,
+              value: &quot;${author}&quot;,
+              short: true
+            ],
+            [
+              title: &quot;Runtime&quot;,
+              value: &quot;${currentBuild.durationString}&quot;,
+              short: true
+            ]
+          ]
+        ]
+      ])
+    }
+
+    stage(&apos;Docker Cleanup&apos;) {
+      dockerCleanup()
+    }
+  } catch (e) {
+    def buildStatus = &quot;Failed&quot;
+
+    notifySlack(&quot;&quot;, slackNotificationChannel, slackUsername, [
+      [
+        title: &quot;Hybris Manual Container Build, build #${env.BUILD_NUMBER}&quot;,
+        title_link: &quot;${env.RUN_DISPLAY_URL}&quot;,
+        color: &quot;danger&quot;,
+        text: &quot;${buildStatus}&quot;,
+        &quot;mrkdwn_in&quot;: [&quot;fields&quot;],
+        fields: [
+          [
+            title: &quot;Branch&quot;,
+            value: &quot;${branch}&quot;,
+            short: true
+          ],
+          [
+            title: &quot;Author&quot;,
+            value: &quot;${author}&quot;,
+            short: true
+          ],
+          [
+            title: &quot;Last Commit&quot;,
+            value: &quot;${message} (&lt;https://bitbucket.org/trekbikes/tbc/commits/${commit}|${pretty}&gt;)&quot;,
+            short: false
+          ],
+          [
+            title: &quot;Error&quot;,
+            value: &quot;${e}&quot;,
+            short: false
+          ]
+        ]
+      ]
+    ])
+
+    throw e
+  }
+}</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
 </flow-definition>
