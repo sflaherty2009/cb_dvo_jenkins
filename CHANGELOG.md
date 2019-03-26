@@ -2,15 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.2.52] - 2019-03-18 
+## [0.2.80] - 2019-03-22
 
-### Changed 
+- Configured cleanup job for MSSQL operational backup blobs.
+
+## [0.2.79] - 2019-03-21
+
+- Configured mysql backup job for trek-wordpress-mysql.
+
+## [0.2.52] - 2019-03-18
+
+### Changed
 
 - Added proper display names for deploy skip, traffic drain and acr cleanup
 - Added database backup job
 - Fixed refresh job
 
-## [0.25.1] - 2019-03-07 
+## [0.2.51] - 2019-03-07
 
 - Added init script for adding components needed for knife commands.
 - Modified vm_agent.rb so that SAS key was not sitting in plain text in vm_agent recipe.
