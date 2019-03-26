@@ -13,7 +13,7 @@
     <script>import groovy.json.JsonOutput
 import java.util.Optional
 
-def slackNotificationChannel = &quot;#devops-test&quot;
+def slackNotificationChannel = &quot;#alerts-devops_builds&quot;
 def slackUsername = &quot;Craig the Containerer&quot;
 def author = &quot;&quot;
 def message = &quot;&quot;
