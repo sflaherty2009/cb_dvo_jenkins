@@ -52,7 +52,7 @@ node{
         sh &apos;docker container prune --force&apos;
       }
 
-      /*notifySlack(&quot;&quot;, slackNotificationChannel, slackUsername, [
+      notifySlack(&quot;&quot;, slackNotificationChannel, slackUsername, [
         [
           color: &quot;good&quot;,
           text: &quot;Cleaned up MSSQL operational blob backups.&quot;,
@@ -65,10 +65,10 @@ node{
             ]
           ]
         ]
-      ])*/
+      ])
     }
   } catch (e) {
-    /*notifySlack(&quot;&quot;, slackNotificationChannel, slackUsername, [
+    notifySlack(&quot;&quot;, slackNotificationChannel, slackUsername, [
       [
         color: &quot;danger&quot;,
         text: &quot;MSSQL backup cleanup process failed.&quot;,
@@ -81,7 +81,7 @@ node{
           ]
         ]
       ]
-    ])*/
+    ])
     throw e
   }
 }</script>

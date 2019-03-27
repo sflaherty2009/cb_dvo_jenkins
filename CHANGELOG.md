@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.87] - 2019-03-27
+
+- Uncommented slack notifications for MSSQL backup job.
+
 ## [0.2.80] - 2019-03-22
 
 - Configured cleanup job for MSSQL operational backup blobs.
