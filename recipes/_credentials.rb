@@ -18,10 +18,10 @@ jenkins_password_credentials 'conSolr' do
   password    azure_auth['service_accounts']['consolr']
 end
 
-jenkins_password_credentials 'TrekDevOps' do
-  id          'TrekDevOps'
+jenkins_password_credentials 'exmplDevOps' do
+  id          'exmplDevOps'
   description 'creds used for pulls/push to bitbucket'
-  password    azure_auth['service_accounts']['TrekDevOps']
+  password    azure_auth['service_accounts']['exmplDevOps']
 end
 
 jenkins_password_credentials 'conBase' do
@@ -55,7 +55,7 @@ jenkins_password_credentials 'bitbucket_pinning' do
 end
 
 jenkins_password_credentials 'confluence_pinning' do
-  id          'scott_flaherty@trekbikes.com'
+  id          'scott_flaherty@example.com'
   description 'scott_flaherty app password for tbc multibranch job'
   password    azure_auth['service_accounts']['confluence_pinning']
 end

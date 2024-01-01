@@ -55,7 +55,7 @@ Calls on jenkins server recipe.
 
 ### server.rb 
 
-Installs base Jenkins installation on server. Installs all plugins required for trek Jenkins Jobs. Calls on _ad_auth recipe to setup active directory authentication. Hardens Jenkins protocols and services as outlined in jenkins online documentation. Creates jenkins jobs via the _jenkins_jobs recipe. Sets up service accounts through the _credentials recipe. 
+Installs base Jenkins installation on server. Installs all plugins required for exmpl Jenkins Jobs. Calls on _ad_auth recipe to setup active directory authentication. Hardens Jenkins protocols and services as outlined in jenkins online documentation. Creates jenkins jobs via the _jenkins_jobs recipe. Sets up service accounts through the _credentials recipe. 
 
 ### master
 

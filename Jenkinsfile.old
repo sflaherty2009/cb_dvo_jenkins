@@ -18,7 +18,7 @@ node{
                 """
             }
         } else {
-            sh "git clone https://TrekDevOps:WQrULM66cGyPyB@bitbucket.org/trekbikes/${env.JOB_NAME}.git /data/cookbooks/${env.JOB_NAME}"
+            sh "git clone https:/xxxx:xxxx@bitbucket.org/${env.JOB_NAME}.git /data/cookbooks/${env.JOB_NAME}"
             sh "mkdir -p mkdir /data/cookbooks/${env.JOB_NAME}/.berkshelf"
             sh "echo '{\"ssl\": {\"verify\": false}}' > /data/cookbooks/${env.JOB_NAME}/.berkshelf/config.json; echo -e \"source :chef_server\nsource 'https://supermarket.chef.io'\n\nmetadata\" > /data/cookbooks/${env.JOB_NAME}/Berksfile"
             sh """

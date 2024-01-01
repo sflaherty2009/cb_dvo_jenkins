@@ -89,7 +89,7 @@ def loop_of_servers_off(servers, environment) {
 def website_status(websites){
     websites.each { website -&gt;
             sh &quot;&quot;&quot;
-                site_check=`curl -u trek:Tr3k2016! -sL --connect-timeout 20 --max-time 30 -w &quot;%{http_code}\\n&quot; ${website} -o /dev/null`; if [[ \$site_check == 200 ]]; then echo &quot;success \$site_check&quot;; else exit 1; fi
+                site_check=`curl -u exmpl:Tr3k2016! -sL --connect-timeout 20 --max-time 30 -w &quot;%{http_code}\\n&quot; ${website} -o /dev/null`; if [[ \$site_check == 200 ]]; then echo &quot;success \$site_check&quot;; else exit 1; fi
             &quot;&quot;&quot;
         }
 }
@@ -97,32 +97,32 @@ def website_status(websites){
 node{
     if (env.environment == &quot;prod&quot;){
         servers = [&apos;azl-prd-web-01&apos;,&apos;azl-prd-web-02&apos;,&apos;azl-prd-web-03&apos;]
-        website = [&quot;www.trekbikes.com&quot;]
+        website = [&quot;www.example.com&quot;]
         component = &quot;34p3jb2bzz44&quot;
     }
     if (env.environment == &apos;dev&apos;){
         servers = [&quot;azl-dev-web-01-az-rg-e2e-dvo1828-lin.eastus2.cloudapp.azure.com&quot;]
-        website = [&quot;dev.trekbikes.com&quot;]
+        website = [&quot;dev.example.com&quot;]
         component = &quot;lskyp6rd2gb0&quot;
     }
     if (env.environment == &apos;test&apos;){
         servers = [&apos;azl-tst-web-01&apos;,&apos;azl-tst-web-02&apos;,&apos;azl-tst-web-03&apos;]
-        website = [&quot;https://www.testhyb.trekbikes.com&quot;]
+        website = [&quot;https://www.testhyb.example.com&quot;]
         component = &quot;y9v9q643h989&quot;
     }
     if (env.environment == &apos;e2e&apos;){
         servers = [&quot;azl-e2e-web-01-az-rg-e2e-dvo1828-lin.eastus2.cloudapp.azure.com&quot;]
-        website = [&quot;e2e.trekbikes.com&quot;]
+        website = [&quot;e2e.example.com&quot;]
         component = &quot;4pfms1110m71&quot;
     }
 
     stage(&apos;turning on/off maintenancePage&apos;){
         if (env.maintenancePage == &quot;on&quot;){
-            slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;#00FF00&apos;, message: &quot;TESTING turning ON maintenance for ${env.environment}&quot;, teamDomain: &apos;trekbikes&apos;, token: &apos;dVxfSjNzkVhjE9ZSgkRfPsmJ&apos;
+            slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;#00FF00&apos;, message: &quot;TESTING turning ON maintenance for ${env.environment}&quot;, teamDomain: &apos;example&apos;, token: &apos;dVxfSjNzkVhjE9ZSgkRfPsmJ&apos;
             loop_of_servers_on(servers, env.environment)
         }
         if (env.maintenancePage == &quot;off&quot;){
-            slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;#00FF00&apos;, message: &quot;TESTING turning OFF maintenance for ${env.environment}&quot;, teamDomain: &apos;trekbikes&apos;, token: &apos;dVxfSjNzkVhjE9ZSgkRfPsmJ&apos;
+            slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;#00FF00&apos;, message: &quot;TESTING turning OFF maintenance for ${env.environment}&quot;, teamDomain: &apos;example&apos;, token: &apos;dVxfSjNzkVhjE9ZSgkRfPsmJ&apos;
             loop_of_servers_off(servers, env.environment)
         }
     }
@@ -131,7 +131,7 @@ node{
         // if we are turning on maintenancePage turn on the statuspage for that environment.
         if (env.maintenancePage == &quot;on&quot;){
             // send slack message letting us know we are adding this statuspage status for outage.
-            slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;#00FF00&apos;, message: &quot;Adding message to statuspage.io for ${env.environment} outage&quot;, teamDomain: &apos;trekbikes&apos;, token: &apos;dVxfSjNzkVhjE9ZSgkRfPsmJ&apos;
+            slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;#00FF00&apos;, message: &quot;Adding message to statuspage.io for ${env.environment} outage&quot;, teamDomain: &apos;example&apos;, token: &apos;dVxfSjNzkVhjE9ZSgkRfPsmJ&apos;
             // deploying statuspage for current environment and component associated.
             deploy_statuspage(env.environment, component)
             // updating component to major_outage since it will not be accesible with maintenance running. 
@@ -150,7 +150,7 @@ node{
             // let&apos;s close our incident. 
             resolve_statuspage(component, incNumber)
             // Send out a slack message notifying devopsbuild that statuspage incident has been resolved.
-            slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;#00FF00&apos;, message: &quot;Resolving statuspage.io for ${env.environment} outage&quot;, teamDomain: &apos;trekbikes&apos;, token: &apos;dVxfSjNzkVhjE9ZSgkRfPsmJ&apos;
+            slackSend channel: &apos;#alerts-devops_builds&apos;, color: &apos;#00FF00&apos;, message: &quot;Resolving statuspage.io for ${env.environment} outage&quot;, teamDomain: &apos;example&apos;, token: &apos;dVxfSjNzkVhjE9ZSgkRfPsmJ&apos;
         }
     }   
 }</script>

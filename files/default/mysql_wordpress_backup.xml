@@ -1,7 +1,7 @@
 <?xml version='1.1' encoding='UTF-8'?>
 <flow-definition plugin="workflow-job@2.32">
   <actions/>
-  <description>Backs up trek-wordpress-mysql databases (aside from sys, mysql, information_schema, and performance_schema) nightly and uploads them to blob storage. Deletes old blob backups per the Trek standard retention policy (https://trekbikes.atlassian.net/wiki/spaces/DVO/pages/427098217/Backups) and cleans up any temporary files.</description>
+  <description>Backs up exmpl-wordpress-mysql databases (aside from sys, mysql, information_schema, and performance_schema) nightly and uploads them to blob storage. Deletes old blob backups per the exmpl standard retention policy (https://example.atlassian.net/wiki/spaces/DVO/pages/427098217/Backups) and cleans up any temporary files.</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <jenkins.model.BuildDiscarderProperty>
@@ -24,7 +24,7 @@
   <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.64">
     <script>import groovy.json.JsonOutput
 
-env.MYSQL_HOST = &apos;trek-wordpress-mysql.mysql.database.azure.com&apos;
+env.MYSQL_HOST = &apos;exmpl-wordpress-mysql.mysql.database.azure.com&apos;
 env.MYSQL_AZURE_SUBSCRIPTION_ID = &apos;f7274d08-200b-4f00-9989-c077287b3aa3&apos;
 
 def slackNotificationChannel = &quot;#alerts-devops_builds&quot;

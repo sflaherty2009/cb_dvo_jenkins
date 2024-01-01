@@ -18,8 +18,8 @@
       <configVersion>2</configVersion>
       <userRemoteConfigs>
         <hudson.plugins.git.UserRemoteConfig>
-          <url>https://bitbucket.org/trekbikes/dvo-wcpweb2.git</url>
-          <credentialsId>TrekDevOps</credentialsId>
+          <url>https://bitbucket.org/example/dvo-wcpweb2.git</url>
+          <credentialsId>exmplDevOps</credentialsId>
         </hudson.plugins.git.UserRemoteConfig>
       </userRemoteConfigs>
       <branches>

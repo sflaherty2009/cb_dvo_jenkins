@@ -14,15 +14,15 @@
       <spec>* * * * * </spec>
       <bitbucketServer></bitbucketServer>
       <cron>* * * * * </cron>
-      <credentialsId>TrekDevOps</credentialsId>
+      <credentialsId>exmplDevOps</credentialsId>
       <username></username>
       <password></password>
-      <repositoryOwner>trekbikes</repositoryOwner>
+      <repositoryOwner>example</repositoryOwner>
       <repositoryName>tbc</repositoryName>
       <branchesFilter></branchesFilter>
       <branchesFilterBySCMIncludes>false</branchesFilterBySCMIncludes>
-      <ciKey>TrekDevOps</ciKey>
-      <ciName>TrekDevOps</ciName>
+      <ciKey>exmplDevOps</ciKey>
+      <ciName>exmplDevOps</ciName>
       <ciSkipPhrases></ciSkipPhrases>
       <checkDestinationCommit>false</checkDestinationCommit>
       <approveIfSuccess>false</approveIfSuccess>
@@ -36,7 +36,7 @@
       <command>curl -d &quot;--gitbranch=${sourceBranch}&quot; \
 -d &quot;-Dsonar.login=70687a9aabff12607a08dcb353ac2fd0249fe93a&quot; \
 -d &quot;-Dsonar.bitbucket.repoSlug=tbc&quot; \
--d &quot;-Dsonar.bitbucket.accountName=trekbikes&quot; \
+-d &quot;-Dsonar.bitbucket.accountName=example&quot; \
 -d &quot;-Dsonar.bitbucket.oauthClientKey=pAJJQT22jU78Ajy4y7&quot; \
 -d &quot;-Dsonar.bitbucket.oauthClientSecret=9ahR83WKDVTPkLhVnYNWWzpZFzVTtVUW&quot; \
 -d &quot;-Dsonar.bitbucket.branchName=${sourceBranch}&quot; \

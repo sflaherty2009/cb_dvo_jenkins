@@ -20,7 +20,7 @@ def message = &quot;&quot;
 
 def notifySlack(text, channel, username, attachments) {
   def slackURL = &apos;https://hooks.slack.com/services/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&apos;
-  def jenkinsIcon = &apos;https://trekbikescdndev.blob.core.windows.net/hybris/avatars/devops/avatar-04.png&apos;
+  def jenkinsIcon = &apos;https://examplecdndev.blob.core.windows.net/hybris/avatars/devops/avatar-04.png&apos;
 
   def payload = JsonOutput.toJson([text: text,
     channel: channel,
@@ -78,7 +78,7 @@ node {
         message: &apos;Hybris base container to use: &apos;,
         ok: &apos;ok&apos;, parameters: [string(defaultValue: &apos;6.6.0.8.0ca7eaf&apos;, description: &apos;.....&apos;, name: &apos;base container version&apos;)])
         
-      git credentialsId: &quot;TrekDevOps&quot;, url: &apos;https://bitbucket.org/trekbikes/tbc.git&apos;, branch: &quot;${branch}&quot;
+      git credentialsId: &quot;exmplDevOps&quot;, url: &apos;https://bitbucket.org/example/tbc.git&apos;, branch: &quot;${branch}&quot;
     }
 
     stage(&apos;Docker Build&apos;) {
@@ -113,7 +113,7 @@ node {
             ],
             [
               title: &quot;Last Commit&quot;,
-              value: &quot;${message} (&lt;https://bitbucket.org/trekbikes/tbc/commits/${commit}|${pretty}&gt;)&quot;,
+              value: &quot;${message} (&lt;https://bitbucket.org/example/tbc/commits/${commit}|${pretty}&gt;)&quot;,
               short: false
             ]
           ]
@@ -191,7 +191,7 @@ node {
           ],
           [
             title: &quot;Last Commit&quot;,
-            value: &quot;${message} (&lt;https://bitbucket.org/trekbikes/tbc/commits/${commit}|${pretty}&gt;)&quot;,
+            value: &quot;${message} (&lt;https://bitbucket.org/example/tbc/commits/${commit}|${pretty}&gt;)&quot;,
             short: false
           ],
           [

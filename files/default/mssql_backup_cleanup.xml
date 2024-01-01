@@ -1,7 +1,7 @@
 <?xml version='1.1' encoding='UTF-8'?>
 <flow-definition plugin="workflow-job@2.32">
   <actions/>
-  <description>Cleans up the aztrksal0420eu20dbbackup/operational blob storage container and all file shares. Maintains backup files as specified in Trek&apos;s retention policy (https://trekbikes.atlassian.net/wiki/spaces/DVO/pages/427098217/Backups).</description>
+  <description>Cleans up the aztrksal0420eu20dbbackup/operational blob storage container and all file shares. Maintains backup files as specified in exmpl&apos;s retention policy (https://example.atlassian.net/wiki/spaces/DVO/pages/427098217/Backups).</description>
   <keepDependencies>false</keepDependencies>
   <properties>
     <jenkins.model.BuildDiscarderProperty>

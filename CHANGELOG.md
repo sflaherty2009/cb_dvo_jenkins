@@ -12,7 +12,7 @@ All notable changes to this project will be documented in this file.
 
 ## [0.2.79] - 2019-03-21
 
-- Configured mysql backup job for trek-wordpress-mysql.
+- Configured mysql backup job for wordpress-mysql.
 
 ## [0.2.52] - 2019-03-18
 

@@ -18,8 +18,8 @@
       <configVersion>2</configVersion>
       <userRemoteConfigs>
         <hudson.plugins.git.UserRemoteConfig>
-          <url>https://bitbucket.org/trekbikes/webapp-trekmaintenance.git</url>
-          <credentialsId>TrekDevOps</credentialsId>
+          <url>https://bitbucket.org/example/webapp-exmplmaintenance.git</url>
+          <credentialsId>exmplDevOps</credentialsId>
         </hudson.plugins.git.UserRemoteConfig>
       </userRemoteConfigs>
       <branches>

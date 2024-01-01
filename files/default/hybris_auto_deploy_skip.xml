@@ -46,7 +46,7 @@ def twentyfourhour = (env.Window.replaceAll(&quot;\\(.*\\)&quot;, &quot;&quot;).
 
 def notifySlack(text, channel, username, attachments) {
   def slackURL = &apos;https://hooks.slack.com/services/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&apos;
-  def jenkinsIcon = &apos;https://trekbikescdndev.blob.core.windows.net/hybris/avatars/devops/avatar-02.png&apos;
+  def jenkinsIcon = &apos;https://examplecdndev.blob.core.windows.net/hybris/avatars/devops/avatar-02.png&apos;
 
   def payload = JsonOutput.toJson([text: text,
     channel: channel,

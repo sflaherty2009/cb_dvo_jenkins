@@ -42,7 +42,7 @@ def slackUsername = &quot;Tony the Traffic Drainer&quot;
 
 def notifySlack(text, channel, username, attachments) {
   def slackURL = &apos;https://hooks.slack.com/services/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&apos;
-  def jenkinsIcon = &apos;https://trekbikescdndev.blob.core.windows.net/hybris/avatars/devops/avatar-08.png&apos;
+  def jenkinsIcon = &apos;https://examplecdndev.blob.core.windows.net/hybris/avatars/devops/avatar-08.png&apos;
 
   def payload = JsonOutput.toJson([text: text,
     channel: channel,
@@ -62,7 +62,7 @@ def dockerRun(command, params) {
 }
 
 def curlCommand(user, password, webServer, command) {
-  sh ( script: &quot;curl -s -u ${user}:${password} \&quot;${webServer}.trek.web:6969/balancer-manager\&quot; | ${command}&quot;, returnStdout: true ).trim()
+  sh ( script: &quot;curl -s -u ${user}:${password} \&quot;${webServer}.exmpl.web:6969/balancer-manager\&quot; | ${command}&quot;, returnStdout: true ).trim()
 }
 
 def trafficDrain(servers, hybrisNode){
@@ -73,7 +73,7 @@ def trafficDrain(servers, hybrisNode){
       buildColor = toggle == &apos;1&apos; ? &quot;warning&quot; : &quot;good&quot;
       buildStatus = toggle == &apos;1&apos; ? &quot;Draining Traffic&quot; : &quot;Traffics a Flowin&quot;
 
-      sh &quot;curl -s -o /dev/null -u ${env.USERNAME}:${env.PASSWORD} -XPOST \&quot;http://${server}.trek.web:6969/balancer-manager?\&quot; \
+      sh &quot;curl -s -o /dev/null -u ${env.USERNAME}:${env.PASSWORD} -XPOST \&quot;http://${server}.exmpl.web:6969/balancer-manager?\&quot; \
           -d b=\&quot;hybris-content-ssl\&quot; \
           -d w=\&quot;ajp://azl-${env.environment}-${hybrisNode}\&quot; \
           -d nonce=\&quot;${nonce}\&quot; \

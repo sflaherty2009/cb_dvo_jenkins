@@ -30,7 +30,7 @@ timestamp=$(date +%s)
 
 tempdir=$WORKSPACE/tmp/DVO_repos_$timestamp
 
-bitbucket_repo_list=($(curl -su $bitbucket_username:$bitbucket_app_key -X GET -H &quot;Content-Type: application/json&quot;  https://api.bitbucket.org/2.0/repositories/trekbikes/\?pagelen\=$bitbucket_page_length\&amp;page\=1\&amp;q\=$bitbucket_search_query\&amp;sort\=name | \
+bitbucket_repo_list=($(curl -su $bitbucket_username:$bitbucket_app_key -X GET -H &quot;Content-Type: application/json&quot;  https://api.bitbucket.org/2.0/repositories/example/\?pagelen\=$bitbucket_page_length\&amp;page\=1\&amp;q\=$bitbucket_search_query\&amp;sort\=name | \
 python -c &apos;
 import json, sys
 obj=json.load(sys.stdin)
@@ -43,7 +43,7 @@ confluence_table_content=&quot;&quot;
 for repo in &quot;${bitbucket_repo_list[@]}&quot;
 do
   dir=&quot;$tempdir/$repo&quot;
-  git clone https://$bitbucket_username:$bitbucket_app_key@bitbucket.org/trekbikes/$repo.git ${dir} 
+  git clone https://$bitbucket_username:$bitbucket_app_key@bitbucket.org/example/$repo.git ${dir} 
 
   if [ \( -f &quot;${dir}/metadata.rb&quot; -a -f &quot;${dir}/environments.json&quot; \) ]; then
     metadata_name=$(awk -F\&apos; &apos;/^name/ {print $2}&apos; ${dir}/metadata.rb)
@@ -110,7 +110,7 @@ do
   fi
 done
 
-confluence_page_json=$(curl -su $confluence_username:$confluence_token https://trekbikes.atlassian.net/wiki/rest/api/content/$confluence_page_id\?status\=any\&amp;expand\=version,title,body.storage)
+confluence_page_json=$(curl -su $confluence_username:$confluence_token https://example.atlassian.net/wiki/rest/api/content/$confluence_page_id\?status\=any\&amp;expand\=version,title,body.storage)
 
 confluence_original_page_body=$(echo $confluence_page_json |\
 python -c &apos;
@@ -140,7 +140,7 @@ confluence_page_footer=&quot;&lt;/tbody&gt;&lt;/table&gt;&lt;p class=\\\&quot;au
 confluence_new_page_title=&quot;$confluence_original_page_title&quot;
 confluence_new_page_body=&quot;${confluence_page_header}${confluence_table_content}${confluence_page_footer}&quot;
 
-curl -su $confluence_username:$confluence_token -X PUT -H &apos;Content-Type: application/json&apos; -d &quot;{\&quot;id\&quot;:\&quot;$confluence_page_id\&quot;,\&quot;type\&quot;:\&quot;page\&quot;,\&quot;title\&quot;:\&quot;$confluence_new_page_title\&quot;,\&quot;space\&quot;:{\&quot;key\&quot;:\&quot;$confluence_page_space\&quot;},\&quot;body\&quot;:{\&quot;storage\&quot;:{\&quot;value\&quot;:\&quot;$confluence_new_page_body\&quot;,\&quot;representation\&quot;:\&quot;storage\&quot;}},\&quot;version\&quot;:{\&quot;number\&quot;:$confluence_next_page_version}}&quot; https://trekbikes.atlassian.net/wiki/rest/api/content/$confluence_page_id &amp;&gt; /dev/null
+curl -su $confluence_username:$confluence_token -X PUT -H &apos;Content-Type: application/json&apos; -d &quot;{\&quot;id\&quot;:\&quot;$confluence_page_id\&quot;,\&quot;type\&quot;:\&quot;page\&quot;,\&quot;title\&quot;:\&quot;$confluence_new_page_title\&quot;,\&quot;space\&quot;:{\&quot;key\&quot;:\&quot;$confluence_page_space\&quot;},\&quot;body\&quot;:{\&quot;storage\&quot;:{\&quot;value\&quot;:\&quot;$confluence_new_page_body\&quot;,\&quot;representation\&quot;:\&quot;storage\&quot;}},\&quot;version\&quot;:{\&quot;number\&quot;:$confluence_next_page_version}}&quot; https://example.atlassian.net/wiki/rest/api/content/$confluence_page_id &amp;&gt; /dev/null
 
 rm -rf /tmp/DVO_repos_*</command>
     </hudson.tasks.Shell>
