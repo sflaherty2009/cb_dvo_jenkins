@@ -28,7 +28,7 @@ def slackNotificationChannel = &quot;#alerts-devops_builds&quot;
 def slackUsername = &quot;The Backerupper&quot;
 
 def notifySlack(text, channel, username, attachments) {
-  def slackURL = &apos;https://hooks.slack.com/services/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&apos;
+  def slackURL = &apos;https://hooks.slack.com/services/xxx/xxx/xxxxO&apos;
 
   def payload = JsonOutput.toJson([text: text,
     channel: channel,

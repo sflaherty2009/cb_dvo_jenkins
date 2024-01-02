@@ -19,7 +19,7 @@ def author = &quot;&quot;
 def message = &quot;&quot;
 
 def notifySlack(text, channel, username, attachments) {
-  def slackURL = &apos;https://hooks.slack.com/services/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&apos;
+  def slackURL = &apos;https://hooks.slack.com/services/xxx/xxx/xxxx&apos;
   def jenkinsIcon = &apos;https://examplecdndev.blob.core.windows.net/hybris/avatars/devops/avatar-04.png&apos;
 
   def payload = JsonOutput.toJson([text: text,
